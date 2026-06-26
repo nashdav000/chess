@@ -100,9 +100,10 @@ public class ChessPiece {
 
         int COLORMODIFIER = pieceColor == ChessGame.TeamColor.BLACK ? -1 : 1;
 
+
         // Forward Movement
         if (board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol)) == null){
-            moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol), null));
+            moves.addAll(promotionCheck(startRow, startCol, COLORMODIFIER, 0));
         }
 
         // Double Movement if at starting position
@@ -117,19 +118,35 @@ public class ChessPiece {
         if (startCol < 8){ // Edge Detection
             ChessPiece other = board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol + 1));
             if (other != null && other.pieceColor != pieceColor){ // If there is a piece and it's not our color
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol + 1), null));
+                moves.addAll(promotionCheck(startRow, startCol, COLORMODIFIER, 1));
             }
         }
 
         if (startCol > 1){ // Edge Detection
             ChessPiece other = board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol - 1));
             if (other != null && other.pieceColor != pieceColor){
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol - 1), null));
+                moves.addAll(promotionCheck(startRow, startCol, COLORMODIFIER, -1));
             }
         }
 
+        return moves;
+    }
 
-        // Promotion
+    private Collection<ChessMove> promotionCheck(int startRow, int startCol, int COLORMODIFIER, int CAPTUREMODIFIER){
+
+        PieceType[] PROMOTIONS = {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        if ((startRow == 7 && pieceColor == ChessGame.TeamColor.WHITE) || (startRow == 2 && pieceColor == ChessGame.TeamColor.BLACK))
+        {
+            for (PieceType promo : PROMOTIONS)
+            {
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol + CAPTUREMODIFIER), promo));
+            }
+        }
+        else{
+            moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol + CAPTUREMODIFIER), null));
+        }
 
         return moves;
     }
