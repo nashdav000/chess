@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.List;
+
 /**
  * Represents moving a chess piece on a chessboard
  * <p>
@@ -47,4 +49,27 @@ public class ChessMove {
     public String toString() {
         return String.format("%s%s", startPosition, endPosition);
     }
+
+    public List diagonalMove()
+    {
+        int[][] diags = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+
+        List moves = List.of();
+        int startRow = startPosition.getRow();
+        int startCol = startPosition.getColumn();
+
+        for (int i = 0; i < 4; i++){
+            int endRow = startRow + diags[i][0];
+            int endCol = startCol + diags[i][1];
+
+            while(endRow < 8 && endRow > 0 && endCol < 8 && endCol > 0){
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
+                endRow += diags[i][0];
+                endCol += diags[i][1];
+            }
+        }
+
+        return moves;
+    }
+
 }
