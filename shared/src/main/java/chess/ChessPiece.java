@@ -154,30 +154,31 @@ public class ChessPiece {
     private Collection<ChessMove> movesGenerator(int startRow, int startCol, int[][] pattern, boolean multiMoves, ChessBoard board){
         Collection<ChessMove> moves = new ArrayList<>();
 
-        for (int i = 0; i < pattern.length; i++){
-            int endRow = startRow + pattern[i][0];
-            int endCol = startCol + pattern[i][1];
+        for (int[] ints : pattern) {
+            int endRow = startRow + ints[0];
+            int endCol = startCol + ints[1];
 
-            while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
+            while (endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0) {
 
                 // Check if the space it is looking at is occupied
                 ChessPiece other = board.getPiece(new ChessPosition(endRow, endCol));
-                if (other != null)
-                {
+                if (other != null) {
                     // If it is, is it on our color, or the other teams color?
-                    if (pieceColor == other.pieceColor){
+                    if (pieceColor == other.pieceColor) {
                         break;
                     }
 
-                    moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
+                    moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol), null));
                     break;
                 }
 
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol), null));
 
-                if (!multiMoves) {break;}
-                endRow += pattern[i][0];
-                endCol += pattern[i][1];
+                if (!multiMoves) {
+                    break;
+                }
+                endRow += ints[0];
+                endCol += ints[1];
             }
         }
 
