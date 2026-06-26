@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents moving a chess piece on a chessboard
@@ -50,26 +51,41 @@ public class ChessMove {
         return String.format("%s%s", startPosition, endPosition);
     }
 
-    public List diagonalMove()
+
+
+    public List horzMove()
     {
-        int[][] diags = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+        int[][] horzs = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
 
         List moves = List.of();
         int startRow = startPosition.getRow();
         int startCol = startPosition.getColumn();
 
         for (int i = 0; i < 4; i++){
-            int endRow = startRow + diags[i][0];
-            int endCol = startCol + diags[i][1];
+            int endRow = startRow + horzs[i][0];
+            int endCol = startCol + horzs[i][1];
 
-            while(endRow < 8 && endRow > 0 && endCol < 8 && endCol > 0){
+            while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
                 moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
-                endRow += diags[i][0];
-                endCol += diags[i][1];
+                endRow += horzs[i][0];
+                endCol += horzs[i][1];
             }
         }
 
         return moves;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessMove chessMove = (ChessMove) o;
+        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startPosition, endPosition, promotionPiece);
+    }
 }

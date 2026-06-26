@@ -1,7 +1,9 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -55,12 +57,45 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
 
+
         switch(piece.getPieceType()){
             case PieceType.BISHOP:
-                return List.of(new ChessMove(new ChessPosition(5, 4), new ChessPosition(1, 8), null));
+                return diagonalMove(myPosition.getRow(), myPosition.getColumn());
         }
         return List.of();
     }
 
+    public List diagonalMove(int startRow, int startCol)
+    {
+        int[][] diags = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
 
+        List<ChessMove> moves = new ArrayList<>();
+
+        for (int i = 0; i < 4; i++){
+            int endRow = startRow + diags[i][0];
+            int endCol = startCol + diags[i][1];
+
+            while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
+                endRow += diags[i][0];
+                endCol += diags[i][1];
+            }
+        }
+
+        return moves;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
 }
