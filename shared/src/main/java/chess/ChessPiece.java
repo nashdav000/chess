@@ -60,63 +60,41 @@ public class ChessPiece {
 
         switch(piece.getPieceType()){
             case PieceType.BISHOP:
-                return diagonalMove(myPosition.getRow(), myPosition.getColumn());
+                return diagonalMove(myPosition.getRow(), myPosition.getColumn(), true);
             case PieceType.ROOK:
-                return horizontalMove(myPosition.getRow(), myPosition.getColumn());
+                return horizontalMove(myPosition.getRow(), myPosition.getColumn(), true);
             case PieceType.QUEEN:
-                List<ChessMove> list = diagonalMove(myPosition.getRow(), myPosition.getColumn());
-                list.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn()));
+                List<ChessMove> list = diagonalMove(myPosition.getRow(), myPosition.getColumn(), true);
+                list.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn(), true));
                 return list;
             case PieceType.KNIGHT:
                 return knightMove(myPosition.getRow(), myPosition.getColumn());
+            case PieceType.KING:
+                List<ChessMove> lst = diagonalMove(myPosition.getRow(), myPosition.getColumn(), false);
+                lst.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn(), false));
+                return lst;
         }
         return List.of();
     }
 
-    public List diagonalMove(int startRow, int startCol)
+    public List diagonalMove(int startRow, int startCol, boolean multi)
     {
         int[][] pattern = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
-        return movesGenerator(startRow, startCol, pattern);
+        return movesGenerator(startRow, startCol, pattern, multi);
     }
 
-    public List horizontalMove(int startRow, int startCol)
+    public List horizontalMove(int startRow, int startCol, boolean multi)
     {
         int[][] pattern = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
-        return movesGenerator(startRow, startCol, pattern);
+        return movesGenerator(startRow, startCol, pattern, multi);
     }
 
     public List knightMove(int startRow, int startCol){
         int[][] pattern = {{2, 1}, {2, -1}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {-1, 2}, {-1, -2}};
-
-        List<ChessMove> moves = new ArrayList<>();
-
-        for (int i = 0; i < pattern.length; i++){
-            int endRow = startRow + pattern[i][0];
-            int endCol = startCol + pattern[i][1];
-
-                // Check if the space it is looking at is occupied
-                /*if (ChessBoard.getPiece(new ChessPosition(endRow, endCol)){
-                /*
-                    // If it is, is it on our color, or the other teams color?
-                    if (pieceColor == other.pieceColor){
-                        break;
-                    }
-                    *
-                    * moves.add(new ChessMove(startRow, startCol), new ChessPosition(endRow, endCol),null));
-                    * break;
-                * }
-                *
-                */
-
-            if (endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
-            }
-        }
-
-        return moves;
+        return movesGenerator(startRow, startCol, pattern, false);
     }
 
-    private List movesGenerator(int startRow, int startCol, int[][] pattern){
+    private List movesGenerator(int startRow, int startCol, int[][] pattern, boolean multiMoves){
         List<ChessMove> moves = new ArrayList<>();
 
         for (int i = 0; i < pattern.length; i++){
@@ -140,6 +118,8 @@ public class ChessPiece {
                 */
 
                 moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
+
+                if (!multiMoves) {break;}
                 endRow += pattern[i][0];
                 endCol += pattern[i][1];
             }
@@ -147,6 +127,7 @@ public class ChessPiece {
 
         return moves;
     }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
