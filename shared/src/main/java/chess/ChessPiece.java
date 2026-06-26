@@ -106,11 +106,28 @@ public class ChessPiece {
         }
 
         // Double Movement if at starting position
-        if ((startRow == 7 && pieceColor == ChessGame.TeamColor.BLACK || startRow == 2 && pieceColor == ChessGame.TeamColor.WHITE) && board.getPiece(new ChessPosition(startRow + (COLORMODIFIER * 2), startCol)) == null){
+        if ((startRow == 7 && pieceColor == ChessGame.TeamColor.BLACK || startRow == 2 && pieceColor == ChessGame.TeamColor.WHITE)
+                && board.getPiece(new ChessPosition(startRow + (COLORMODIFIER * 2), startCol)) == null
+                && board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol)) == null)
+        {
             moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + (COLORMODIFIER * 2), startCol), null));
         }
 
         // Capture a piece
+        if (startCol < 8){ // Edge Detection
+            ChessPiece other = board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol + 1));
+            if (other != null && other.pieceColor != pieceColor){ // If there is a piece and it's not our color
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol + 1), null));
+            }
+        }
+
+        if (startCol > 1){ // Edge Detection
+            ChessPiece other = board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol - 1));
+            if (other != null && other.pieceColor != pieceColor){
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol - 1), null));
+            }
+        }
+
 
         // Promotion
 
