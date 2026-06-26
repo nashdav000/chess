@@ -87,13 +87,39 @@ public class ChessPiece {
 
     public List knightMove(int startRow, int startCol){
         int[][] pattern = {{2, 1}, {2, -1}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {-1, 2}, {-1, -2}};
-        return movesGenerator(startRow, startCol, pattern);
+
+        List<ChessMove> moves = new ArrayList<>();
+
+        for (int i = 0; i < pattern.length; i++){
+            int endRow = startRow + pattern[i][0];
+            int endCol = startCol + pattern[i][1];
+
+                // Check if the space it is looking at is occupied
+                /*if (ChessBoard.getPiece(new ChessPosition(endRow, endCol)){
+                /*
+                    // If it is, is it on our color, or the other teams color?
+                    if (pieceColor == other.pieceColor){
+                        break;
+                    }
+                    *
+                    * moves.add(new ChessMove(startRow, startCol), new ChessPosition(endRow, endCol),null));
+                    * break;
+                * }
+                *
+                */
+
+            if (endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
+            }
+        }
+
+        return moves;
     }
 
     private List movesGenerator(int startRow, int startCol, int[][] pattern){
         List<ChessMove> moves = new ArrayList<>();
 
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < pattern.length; i++){
             int endRow = startRow + pattern[i][0];
             int endCol = startCol + pattern[i][1];
 
