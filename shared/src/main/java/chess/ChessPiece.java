@@ -57,46 +57,45 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece piece = board.getPiece(myPosition);
 
-
         switch(piece.getPieceType()){
             case PieceType.BISHOP:
-                return diagonalMove(myPosition.getRow(), myPosition.getColumn(), true);
+                return diagonalMove(myPosition.getRow(), myPosition.getColumn(), true, board);
             case PieceType.ROOK:
-                return horizontalMove(myPosition.getRow(), myPosition.getColumn(), true);
+                return horizontalMove(myPosition.getRow(), myPosition.getColumn(), true, board);
             case PieceType.QUEEN:
-                Collection<ChessMove> list = diagonalMove(myPosition.getRow(), myPosition.getColumn(), true);
-                list.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn(), true));
+                Collection<ChessMove> list = diagonalMove(myPosition.getRow(), myPosition.getColumn(), true, board);
+                list.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn(), true, board));
                 return list;
             case PieceType.KNIGHT:
-                return knightMove(myPosition.getRow(), myPosition.getColumn());
+                return knightMove(myPosition.getRow(), myPosition.getColumn(), board);
             case PieceType.KING:
-                Collection<ChessMove> lst = diagonalMove(myPosition.getRow(), myPosition.getColumn(), false);
-                lst.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn(), false));
+                Collection<ChessMove> lst = diagonalMove(myPosition.getRow(), myPosition.getColumn(), false, board);
+                lst.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn(), false, board));
                 return lst;
             case PieceType.PAWN:
-                return pawnMove(myPosition.getRow(), myPosition.getColumn());
+                return pawnMove(myPosition.getRow(), myPosition.getColumn(), board);
         }
         return List.of();
     }
 
-    public Collection<ChessMove> diagonalMove(int startRow, int startCol, boolean multi)
+    public Collection<ChessMove> diagonalMove(int startRow, int startCol, boolean multi, ChessBoard board)
     {
         int[][] pattern = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
-        return movesGenerator(startRow, startCol, pattern, multi);
+        return movesGenerator(startRow, startCol, pattern, multi, board);
     }
 
-    public Collection<ChessMove> horizontalMove(int startRow, int startCol, boolean multi)
+    public Collection<ChessMove> horizontalMove(int startRow, int startCol, boolean multi, ChessBoard board)
     {
         int[][] pattern = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
-        return movesGenerator(startRow, startCol, pattern, multi);
+        return movesGenerator(startRow, startCol, pattern, multi, board);
     }
 
-    public Collection<ChessMove> knightMove(int startRow, int startCol){
+    public Collection<ChessMove> knightMove(int startRow, int startCol, ChessBoard board){
         int[][] pattern = {{2, 1}, {2, -1}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {-1, 2}, {-1, -2}};
-        return movesGenerator(startRow, startCol, pattern, false);
+        return movesGenerator(startRow, startCol, pattern, false, board);
     }
 
-    public Collection<ChessMove> pawnMove(int startRow, int startCol){
+    public Collection<ChessMove> pawnMove(int startRow, int startCol, ChessBoard board){
         // Need to be able to reference other objects
         // Also needs to be able to reference the ChessMove get promotion piece
         // new ChessMove(startRow, startCol, promotionPiece)
@@ -104,7 +103,7 @@ public class ChessPiece {
         return null;
     }
 
-    private Collection<ChessMove> movesGenerator(int startRow, int startCol, int[][] pattern, boolean multiMoves){
+    private Collection<ChessMove> movesGenerator(int startRow, int startCol, int[][] pattern, boolean multiMoves, ChessBoard board){
         List<ChessMove> moves = new ArrayList<>();
 
         for (int i = 0; i < pattern.length; i++){
@@ -114,18 +113,18 @@ public class ChessPiece {
             while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
 
                 // Check if the space it is looking at is occupied
-                /*if (ChessBoard.getPiece(new ChessPosition(endRow, endCol)){
-                /*
+
+                ChessPiece other = board.getPiece(new ChessPosition(endRow, endCol));
+                if (other != null)
+                {
                     // If it is, is it on our color, or the other teams color?
                     if (pieceColor == other.pieceColor){
                         break;
                     }
-                    *
-                    * moves.add(new ChessMove(startRow, startCol), new ChessPosition(endRow, endCol),null));
-                    * break;
-                * }
-                *
-                */
+
+                    moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
+                    break;
+                }
 
                 moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
 
