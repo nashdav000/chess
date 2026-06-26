@@ -64,37 +64,47 @@ public class ChessPiece {
             case PieceType.ROOK:
                 return horizontalMove(myPosition.getRow(), myPosition.getColumn(), true);
             case PieceType.QUEEN:
-                List<ChessMove> list = diagonalMove(myPosition.getRow(), myPosition.getColumn(), true);
+                Collection<ChessMove> list = diagonalMove(myPosition.getRow(), myPosition.getColumn(), true);
                 list.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn(), true));
                 return list;
             case PieceType.KNIGHT:
                 return knightMove(myPosition.getRow(), myPosition.getColumn());
             case PieceType.KING:
-                List<ChessMove> lst = diagonalMove(myPosition.getRow(), myPosition.getColumn(), false);
+                Collection<ChessMove> lst = diagonalMove(myPosition.getRow(), myPosition.getColumn(), false);
                 lst.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn(), false));
                 return lst;
+            case PieceType.PAWN:
+                return pawnMove(myPosition.getRow(), myPosition.getColumn());
         }
         return List.of();
     }
 
-    public List diagonalMove(int startRow, int startCol, boolean multi)
+    public Collection<ChessMove> diagonalMove(int startRow, int startCol, boolean multi)
     {
         int[][] pattern = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
         return movesGenerator(startRow, startCol, pattern, multi);
     }
 
-    public List horizontalMove(int startRow, int startCol, boolean multi)
+    public Collection<ChessMove> horizontalMove(int startRow, int startCol, boolean multi)
     {
         int[][] pattern = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
         return movesGenerator(startRow, startCol, pattern, multi);
     }
 
-    public List knightMove(int startRow, int startCol){
+    public Collection<ChessMove> knightMove(int startRow, int startCol){
         int[][] pattern = {{2, 1}, {2, -1}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {-1, 2}, {-1, -2}};
         return movesGenerator(startRow, startCol, pattern, false);
     }
 
-    private List movesGenerator(int startRow, int startCol, int[][] pattern, boolean multiMoves){
+    public Collection<ChessMove> pawnMove(int startRow, int startCol){
+        // Need to be able to reference other objects
+        // Also needs to be able to reference the ChessMove get promotion piece
+        // new ChessMove(startRow, startCol, promotionPiece)
+
+        return null;
+    }
+
+    private Collection<ChessMove> movesGenerator(int startRow, int startCol, int[][] pattern, boolean multiMoves){
         List<ChessMove> moves = new ArrayList<>();
 
         for (int i = 0; i < pattern.length; i++){
