@@ -67,21 +67,36 @@ public class ChessPiece {
                 List<ChessMove> list = diagonalMove(myPosition.getRow(), myPosition.getColumn());
                 list.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn()));
                 return list;
+            case PieceType.KNIGHT:
+                return knightMove(myPosition.getRow(), myPosition.getColumn());
         }
         return List.of();
     }
 
     public List diagonalMove(int startRow, int startCol)
     {
-        int[][] diags = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+        int[][] pattern = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+        return movesGenerator(startRow, startCol, pattern);
+    }
 
+    public List horizontalMove(int startRow, int startCol)
+    {
+        int[][] pattern = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
+        return movesGenerator(startRow, startCol, pattern);
+    }
+
+    public List knightMove(int startRow, int startCol){
+        int[][] pattern = {{2, 1}, {2, -1}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {-1, 2}, {-1, -2}};
+        return movesGenerator(startRow, startCol, pattern);
+    }
+
+    private List movesGenerator(int startRow, int startCol, int[][] pattern){
         List<ChessMove> moves = new ArrayList<>();
 
         for (int i = 0; i < 4; i++){
-            int endRow = startRow + diags[i][0];
-            int endCol = startCol + diags[i][1];
+            int endRow = startRow + pattern[i][0];
+            int endCol = startCol + pattern[i][1];
 
-            // Check if in the move is in bounds of the board
             while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
 
                 // Check if the space it is looking at is occupied
@@ -99,34 +114,13 @@ public class ChessPiece {
                 */
 
                 moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
-                endRow += diags[i][0];
-                endCol += diags[i][1];
+                endRow += pattern[i][0];
+                endCol += pattern[i][1];
             }
         }
 
         return moves;
     }
-
-    public List horizontalMove(int startRow, int startCol)
-    {
-        int[][] horzs = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
-
-        List<ChessMove> moves = new ArrayList<>();
-
-        for (int i = 0; i < 4; i++){
-            int endRow = startRow + horzs[i][0];
-            int endCol = startCol + horzs[i][1];
-
-            while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
-                endRow += horzs[i][0];
-                endCol += horzs[i][1];
-            }
-        }
-
-        return moves;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
