@@ -98,22 +98,21 @@ public class ChessPiece {
     public Collection<ChessMove> pawnMove(int startRow, int startCol, ChessBoard board){
         Collection<ChessMove> moves = new ArrayList<>();
 
-        if (pieceColor == ChessGame.TeamColor.BLACK)
-        {
-            // Forward Movement
-            if (board.getPiece(new ChessPosition(startRow - 1, startCol)) == null){
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow - 1, startCol), null));
-            }
+        int COLORMODIFIER = pieceColor == ChessGame.TeamColor.BLACK ? -1 : 1;
 
-            // Double Movement if at starting position
-            if (startRow == 7 && board.getPiece(new ChessPosition(startRow - 2, startCol)) == null){
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow - 2, startCol), null));
-            }
-
-            // Capture a piece
-
-            // Promotion
+        // Forward Movement
+        if (board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol)) == null){
+            moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol), null));
         }
+
+        // Double Movement if at starting position
+        if ((startRow == 7 && pieceColor == ChessGame.TeamColor.BLACK || startRow == 2 && pieceColor == ChessGame.TeamColor.WHITE) && board.getPiece(new ChessPosition(startRow + (COLORMODIFIER * 2), startCol)) == null){
+            moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + (COLORMODIFIER * 2), startCol), null));
+        }
+
+        // Capture a piece
+
+        // Promotion
 
         return moves;
     }
