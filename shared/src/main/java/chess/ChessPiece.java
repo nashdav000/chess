@@ -96,15 +96,30 @@ public class ChessPiece {
     }
 
     public Collection<ChessMove> pawnMove(int startRow, int startCol, ChessBoard board){
-        // Need to be able to reference other objects
-        // Also needs to be able to reference the ChessMove get promotion piece
-        // new ChessMove(startRow, startCol, promotionPiece)
+        Collection<ChessMove> moves = new ArrayList<>();
 
-        return null;
+        if (pieceColor == ChessGame.TeamColor.BLACK)
+        {
+            // Forward Movement
+            if (board.getPiece(new ChessPosition(startRow - 1, startCol)) == null){
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow - 1, startCol), null));
+            }
+
+            // Double Movement if at starting position
+            if (startRow == 7 && board.getPiece(new ChessPosition(startRow - 2, startCol)) == null){
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow - 2, startCol), null));
+            }
+
+            // Capture a piece
+
+            // Promotion
+        }
+
+        return moves;
     }
 
     private Collection<ChessMove> movesGenerator(int startRow, int startCol, int[][] pattern, boolean multiMoves, ChessBoard board){
-        List<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new ArrayList<>();
 
         for (int i = 0; i < pattern.length; i++){
             int endRow = startRow + pattern[i][0];
@@ -113,7 +128,6 @@ public class ChessPiece {
             while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
 
                 // Check if the space it is looking at is occupied
-
                 ChessPiece other = board.getPiece(new ChessPosition(endRow, endCol));
                 if (other != null)
                 {
