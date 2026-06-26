@@ -63,6 +63,10 @@ public class ChessPiece {
                 return diagonalMove(myPosition.getRow(), myPosition.getColumn());
             case PieceType.ROOK:
                 return horizontalMove(myPosition.getRow(), myPosition.getColumn());
+            case PieceType.QUEEN:
+                List<ChessMove> list = diagonalMove(myPosition.getRow(), myPosition.getColumn());
+                list.addAll(horizontalMove(myPosition.getRow(), myPosition.getColumn()));
+                return list;
         }
         return List.of();
     }
