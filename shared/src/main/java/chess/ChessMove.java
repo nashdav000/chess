@@ -51,30 +51,6 @@ public class ChessMove {
         return String.format("%s%s", startPosition, endPosition);
     }
 
-
-
-    public List horzMove()
-    {
-        int[][] horzs = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
-
-        List moves = List.of();
-        int startRow = startPosition.getRow();
-        int startCol = startPosition.getColumn();
-
-        for (int i = 0; i < 4; i++){
-            int endRow = startRow + horzs[i][0];
-            int endCol = startCol + horzs[i][1];
-
-            while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
-                endRow += horzs[i][0];
-                endCol += horzs[i][1];
-            }
-        }
-
-        return moves;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

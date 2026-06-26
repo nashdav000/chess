@@ -61,6 +61,8 @@ public class ChessPiece {
         switch(piece.getPieceType()){
             case PieceType.BISHOP:
                 return diagonalMove(myPosition.getRow(), myPosition.getColumn());
+            case PieceType.ROOK:
+                return horizontalMove(myPosition.getRow(), myPosition.getColumn());
         }
         return List.of();
     }
@@ -75,10 +77,46 @@ public class ChessPiece {
             int endRow = startRow + diags[i][0];
             int endCol = startCol + diags[i][1];
 
+            // Check if in the move is in bounds of the board
             while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
+
+                // Check if the space it is looking at is occupied
+                /*if (ChessBoard.getPiece(new ChessPosition(endRow, endCol)){
+                /*
+                    // If it is, is it on our color, or the other teams color?
+                    if (pieceColor == other.pieceColor){
+                        break;
+                    }
+                    *
+                    * moves.add(new ChessMove(startRow, startCol), new ChessPosition(endRow, endCol),null));
+                    * break;
+                * }
+                *
+                */
+
                 moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
                 endRow += diags[i][0];
                 endCol += diags[i][1];
+            }
+        }
+
+        return moves;
+    }
+
+    public List horizontalMove(int startRow, int startCol)
+    {
+        int[][] horzs = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
+
+        List<ChessMove> moves = new ArrayList<>();
+
+        for (int i = 0; i < 4; i++){
+            int endRow = startRow + horzs[i][0];
+            int endCol = startCol + horzs[i][1];
+
+            while(endRow < 9 && endRow > 0 && endCol < 9 && endCol > 0){
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(endRow, endCol),null));
+                endRow += horzs[i][0];
+                endCol += horzs[i][1];
             }
         }
 
