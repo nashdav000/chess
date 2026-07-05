@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -10,11 +11,12 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    private TeamColor _turn = TeamColor.WHITE;
-    private ChessBoard _board = new ChessBoard();
+    private TeamColor _turn;
+    private ChessBoard _board;
 
     public ChessGame() {
-
+        _turn = TeamColor.WHITE;
+        _board = new ChessBoard();
     }
 
     /**
@@ -72,6 +74,8 @@ public class ChessGame {
         if (valids == null || !valids.contains(move)){
             throw new InvalidMoveException("Invalid Move");
         }
+
+        _turn = _turn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
@@ -111,7 +115,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        _board = board;
     }
 
     /**
@@ -120,8 +124,21 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return _board;
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return _turn == chessGame._turn && Objects.equals(_board, chessGame._board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_turn, _board);
+    }
 }
