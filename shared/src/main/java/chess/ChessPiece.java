@@ -78,24 +78,24 @@ public class ChessPiece {
         return List.of();
     }
 
-    public Collection<ChessMove> diagonalMove(int startRow, int startCol, boolean multi, ChessBoard board)
+    private Collection<ChessMove> diagonalMove(int startRow, int startCol, boolean multi, ChessBoard board)
     {
         int[][] pattern = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
         return movesGenerator(startRow, startCol, pattern, multi, board);
     }
 
-    public Collection<ChessMove> horizontalMove(int startRow, int startCol, boolean multi, ChessBoard board)
+    private Collection<ChessMove> horizontalMove(int startRow, int startCol, boolean multi, ChessBoard board)
     {
         int[][] pattern = {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
         return movesGenerator(startRow, startCol, pattern, multi, board);
     }
 
-    public Collection<ChessMove> knightMove(int startRow, int startCol, ChessBoard board){
+    private Collection<ChessMove> knightMove(int startRow, int startCol, ChessBoard board){
         int[][] pattern = {{2, 1}, {2, -1}, {1, 2}, {1, -2}, {-2, 1}, {-2, -1}, {-1, 2}, {-1, -2}};
         return movesGenerator(startRow, startCol, pattern, false, board);
     }
 
-    public Collection<ChessMove> pawnMove(int startRow, int startCol, ChessBoard board){
+    private Collection<ChessMove> pawnMove(int startRow, int startCol, ChessBoard board){
         Collection<ChessMove> moves = new ArrayList<>();
 
         int COLORMODIFIER = pieceColor == ChessGame.TeamColor.BLACK ? -1 : 1;
