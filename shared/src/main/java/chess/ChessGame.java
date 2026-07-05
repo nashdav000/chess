@@ -69,11 +69,33 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        Collection<ChessMove> valids = validMoves(move.getStartPosition());
+        Collection<ChessMove> valid = validMoves(move.getStartPosition());
 
-        if (valids == null || !valids.contains(move)){
+        // Check that the move is valid
+        if (valid == null || !valid.contains(move)) {
             throw new InvalidMoveException("Invalid Move");
         }
+
+        // Initialize variables
+        ChessPosition startPos = move.getStartPosition();
+        ChessPosition endPos = move.getEndPosition();
+        ChessPiece startPiece = _board.getPiece(startPos);
+
+        // Check that the right player is moving
+        if (startPiece.getTeamColor() != _turn){
+            throw new InvalidMoveException("Not your turn");
+        }
+
+        // Move the piece, checking whether it should be promoted or not
+        if (move.getPromotionPiece() != null){
+            _board.addPiece(endPos, new ChessPiece(startPiece.getTeamColor(), move.getPromotionPiece()));
+        }
+        else{
+            _board.addPiece(endPos, startPiece);
+        }
+
+        // Remove the piece from where it started
+        _board.addPiece(startPos, null);
 
         _turn = _turn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
     }
