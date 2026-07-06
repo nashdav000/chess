@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -59,33 +60,37 @@ public class ChessGame {
         }
 
         Collection<ChessMove> moves = piece.pieceMoves(_board, startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>(moves);
 
         // Make the move and see if the king is in check
         for (ChessMove move : moves){
-            ChessBoard test = _board;
 
             // Initialize variables
             ChessPosition startPos = move.getStartPosition();
             ChessPosition endPos = move.getEndPosition();
-            ChessPiece startPiece = test.getPiece(startPos);
+            ChessPiece startPiece = _board.getPiece(startPos);
 
             // Move the piece, checking whether it should be promoted or not
             if (move.getPromotionPiece() != null){
-                test.addPiece(endPos, new ChessPiece(startPiece.getTeamColor(), move.getPromotionPiece()));
+                _board.addPiece(endPos, new ChessPiece(startPiece.getTeamColor(), move.getPromotionPiece()));
             }
             else{
-                test.addPiece(endPos, startPiece);
+                _board.addPiece(endPos, startPiece);
             }
 
             // Remove the piece from where it started
-            test.addPiece(startPos, null);
+            _board.addPiece(startPos, null);
 
             if (isInCheck(_turn)){
-                moves.remove(move);
+                validMoves.remove(move);
             }
+
+            // Undo the fake move
+            _board.addPiece(startPos, startPiece);
+            _board.addPiece(endPos, null);
         }
 
-        return moves;
+        return validMoves;
     }
 
     public void makeMove(ChessMove move) throws InvalidMoveException {
@@ -250,9 +255,11 @@ public class ChessGame {
             for (int y = 1; y < 9; y++){
                 ChessPiece piece = _board.getPiece(new ChessPosition(x, y));
 
-                if (piece == null || piece.getTeamColor() != teamColor){break;}
+                if (piece == null || piece.getTeamColor() != teamColor){continue;}
 
-                if (!piece.pieceMoves(_board, new ChessPosition(x, y)).isEmpty()){
+//                Collection<ChessMove> moves = piece.pieceMoves(_board, new ChessPosition(x, y));
+//                moves = validMoves(new ChessPosition(x, y));
+                if (!validMoves(new ChessPosition(x, y)).isEmpty()){
                     canMove = true;
                 }
             }
