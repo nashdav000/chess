@@ -149,7 +149,8 @@ public class ChessGame {
             for (int y = 1; y<9; y++){
                 ChessPiece piece = _board.getPiece(new ChessPosition(x, y));
 
-                if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() != ChessPiece.PieceType.KING){
+                // If there's a piece of the opposite color
+                if (piece != null && piece.getTeamColor() != teamColor){
                     Collection<ChessMove> moves = piece.pieceMoves(_board, new ChessPosition(x, y));
                     if (moves.contains(king)){
                         return true;
