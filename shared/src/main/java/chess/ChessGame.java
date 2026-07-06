@@ -62,12 +62,6 @@ public class ChessGame {
         return moves;
     }
 
-    /**
-     * Makes a move in the chess game
-     *
-     * @param move chess move to perform
-     * @throws InvalidMoveException if move is invalid
-     */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> valid = validMoves(move.getStartPosition());
 
@@ -107,8 +101,99 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition king = new ChessPosition(1, 1);
+
+        // Find the king
+        for (int x = 1; x<9; x++){
+            for (int y = 1; y<9; y++){
+                ChessPiece piece = _board.getPiece(new ChessPosition(x, y));
+
+                if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING){
+                    king = new ChessPosition(x, y);
+                }
+            }
+        }
+
+        // Check the straight moves
+        int[][] pattern = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        for (int[] move : pattern)
+        {
+            int row = king.getRow() + move[0];
+            int col = king.getColumn() + move[1];
+
+            while (0 < row && row < 9 && 0 < col && col < 9){
+                ChessPiece other = _board.getPiece(new ChessPosition(row, col));
+                if (other != null){
+                    if (other.getTeamColor() != teamColor && (other.getPieceType() == ChessPiece.PieceType.QUEEN || other.getPieceType() == ChessPiece.PieceType.ROOK)){
+                        return true;
+                    }
+                    break;
+                }
+                row += move[0];
+                col += move[1];
+            }
+        }
+
+        // Check the diagonals
+        pattern = new int[][] {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
+        for (int[] move : pattern)
+        {
+            int row = king.getRow() + move[0];
+            int col = king.getColumn() + move[1];
+
+            while (0 < row && row < 9 && 0 < col && col < 9){
+                ChessPiece other = _board.getPiece(new ChessPosition(row, col));
+                if (other != null){
+                    if (other.getTeamColor() != teamColor && (other.getPieceType() == ChessPiece.PieceType.QUEEN || other.getPieceType() == ChessPiece.PieceType.BISHOP))
+                    {
+                        return true;
+                    }
+                    break;
+                }
+                row += move[0];
+                col += move[1];
+            }
+        }
+
+        // Check for knights
+        pattern = new int[][] {{2, 1}, {-2, 1}, {2, -1}, {-2, -1}, {1, 2}, {-1, 2}, {1, -2}, {-1, -2}};
+        for (int[] move : pattern)
+        {
+            int row = king.getRow() + move[0];
+            int col = king.getColumn() + move[1];
+
+            if (0 < row && row < 9 && 0 < col && col < 9){
+                ChessPiece other = _board.getPiece(new ChessPosition(row, col));
+                if (other != null){
+                    if (other.getTeamColor() != teamColor && (other.getPieceType() == ChessPiece.PieceType.QUEEN || other.getPieceType() == ChessPiece.PieceType.BISHOP)){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        // Check for pawns
+        // Check right
+        int color = teamColor == TeamColor.BLACK ? -1 : 1;
+        if (king.getColumn() < 8 && king.getRow() != 4 + (4 * color)){
+            ChessPiece other = _board.getPiece(new ChessPosition(king.getRow() + color, king.getColumn() + 1));
+            if (other != null && other.getPieceType() == ChessPiece.PieceType.PAWN && other.getTeamColor() != teamColor){
+                return true;
+            }
+        }
+        // Check left
+        if (king.getColumn() < 8 && king.getRow() != 4 + (4 * color)){
+            ChessPiece other = _board.getPiece(new ChessPosition(king.getRow() + color, king.getColumn() + 1));
+            if (other != null && other.getPieceType() == ChessPiece.PieceType.PAWN && other.getTeamColor() != teamColor){
+                return true;
+            }
+        }
+
+        // If all the checks are good, then we are good
+        return false;
     }
+
+
 
     /**
      * Determines if the given team is in checkmate
