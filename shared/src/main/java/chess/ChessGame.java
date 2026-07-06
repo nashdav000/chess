@@ -51,6 +51,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+
         ChessPiece piece = _board.getPiece(startPosition);
         if (piece == null)
         {
@@ -58,6 +59,31 @@ public class ChessGame {
         }
 
         Collection<ChessMove> moves = piece.pieceMoves(_board, startPosition);
+
+        // Make the move and see if the king is in check
+        for (ChessMove move : moves){
+            ChessBoard test = _board;
+
+            // Initialize variables
+            ChessPosition startPos = move.getStartPosition();
+            ChessPosition endPos = move.getEndPosition();
+            ChessPiece startPiece = test.getPiece(startPos);
+
+            // Move the piece, checking whether it should be promoted or not
+            if (move.getPromotionPiece() != null){
+                test.addPiece(endPos, new ChessPiece(startPiece.getTeamColor(), move.getPromotionPiece()));
+            }
+            else{
+                test.addPiece(endPos, startPiece);
+            }
+
+            // Remove the piece from where it started
+            test.addPiece(startPos, null);
+
+            if (isInCheck(_turn)){
+                moves.remove(move);
+            }
+        }
 
         return moves;
     }
@@ -165,7 +191,7 @@ public class ChessGame {
             if (0 < row && row < 9 && 0 < col && col < 9){
                 ChessPiece other = _board.getPiece(new ChessPosition(row, col));
                 if (other != null){
-                    if (other.getTeamColor() != teamColor && (other.getPieceType() == ChessPiece.PieceType.QUEEN || other.getPieceType() == ChessPiece.PieceType.BISHOP)){
+                    if (other.getTeamColor() != teamColor && other.getPieceType() == ChessPiece.PieceType.KNIGHT){
                         return true;
                     }
                 }
@@ -189,10 +215,26 @@ public class ChessGame {
             }
         }
 
+        // Check for the king (because this is after the move)
+        pattern = new int[][] {{0, 1}, {0, -1}, {1, 0}, {-1, -0}, {1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
+        for (int[] move : pattern)
+        {
+            int row = king.getRow() + move[0];
+            int col = king.getColumn() + move[1];
+
+            if (0 < row && row < 9 && 0 < col && col < 9){
+                ChessPiece other = _board.getPiece(new ChessPosition(row, col));
+                if (other != null){
+                    if (other.getTeamColor() != teamColor && other.getPieceType() == ChessPiece.PieceType.KING){
+                        return true;
+                    }
+                }
+            }
+        }
+
         // If all the checks are good, then we are good
         return false;
     }
-
 
 
     /**
@@ -202,7 +244,21 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        boolean canMove = false;
+
+        for (int x = 1; x < 9; x++){
+            for (int y = 1; y < 9; y++){
+                ChessPiece piece = _board.getPiece(new ChessPosition(x, y));
+
+                if (piece == null || piece.getTeamColor() != teamColor){break;}
+
+                if (!piece.pieceMoves(_board, new ChessPosition(x, y)).isEmpty()){
+                    canMove = true;
+                }
+            }
+        }
+
+        return !canMove;
     }
 
     /**
