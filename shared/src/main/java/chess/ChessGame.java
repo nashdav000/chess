@@ -145,99 +145,19 @@ public class ChessGame {
             }
         }
 
-        // Check the straight moves
-        int[][] pattern = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-        for (int[] move : pattern)
-        {
-            int row = king.getRow() + move[0];
-            int col = king.getColumn() + move[1];
+        for (int x = 1; x<9; x++){
+            for (int y = 1; y<9; y++){
+                ChessPiece piece = _board.getPiece(new ChessPosition(x, y));
 
-            while (0 < row && row < 9 && 0 < col && col < 9){
-                ChessPiece other = _board.getPiece(new ChessPosition(row, col));
-                if (other != null){
-                    if (other.getTeamColor() != teamColor && (other.getPieceType() == ChessPiece.PieceType.QUEEN || other.getPieceType() == ChessPiece.PieceType.ROOK)){
-                        return true;
-                    }
-                    break;
-                }
-                row += move[0];
-                col += move[1];
-            }
-        }
-
-        // Check the diagonals
-        pattern = new int[][] {{1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
-        for (int[] move : pattern)
-        {
-            int row = king.getRow() + move[0];
-            int col = king.getColumn() + move[1];
-
-            while (0 < row && row < 9 && 0 < col && col < 9){
-                ChessPiece other = _board.getPiece(new ChessPosition(row, col));
-                if (other != null){
-                    if (other.getTeamColor() != teamColor && (other.getPieceType() == ChessPiece.PieceType.QUEEN || other.getPieceType() == ChessPiece.PieceType.BISHOP))
-                    {
-                        return true;
-                    }
-                    break;
-                }
-                row += move[0];
-                col += move[1];
-            }
-        }
-
-        // Check for knights
-        pattern = new int[][] {{2, 1}, {-2, 1}, {2, -1}, {-2, -1}, {1, 2}, {-1, 2}, {1, -2}, {-1, -2}};
-        for (int[] move : pattern)
-        {
-            int row = king.getRow() + move[0];
-            int col = king.getColumn() + move[1];
-
-            if (0 < row && row < 9 && 0 < col && col < 9){
-                ChessPiece other = _board.getPiece(new ChessPosition(row, col));
-                if (other != null){
-                    if (other.getTeamColor() != teamColor && other.getPieceType() == ChessPiece.PieceType.KNIGHT){
+                if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() != ChessPiece.PieceType.KING){
+                    Collection<ChessMove> moves = piece.pieceMoves(_board, new ChessPosition(x, y));
+                    if (moves.contains(king)){
                         return true;
                     }
                 }
             }
         }
 
-        // Check for pawns
-        // Check right
-        int color = teamColor == TeamColor.BLACK ? -1 : 1;
-        if (king.getColumn() < 8 && king.getRow() != 4 + (4 * color)){
-            ChessPiece other = _board.getPiece(new ChessPosition(king.getRow() + color, king.getColumn() + 1));
-            if (other != null && other.getPieceType() == ChessPiece.PieceType.PAWN && other.getTeamColor() != teamColor){
-                return true;
-            }
-        }
-        // Check left
-        if (king.getColumn() < 8 && king.getRow() != 4 + (4 * color)){
-            ChessPiece other = _board.getPiece(new ChessPosition(king.getRow() + color, king.getColumn() + 1));
-            if (other != null && other.getPieceType() == ChessPiece.PieceType.PAWN && other.getTeamColor() != teamColor){
-                return true;
-            }
-        }
-
-        // Check for the king (because this is after the move)
-        pattern = new int[][] {{0, 1}, {0, -1}, {1, 0}, {-1, -0}, {1, 1}, {-1, 1}, {1, -1}, {-1, -1}};
-        for (int[] move : pattern)
-        {
-            int row = king.getRow() + move[0];
-            int col = king.getColumn() + move[1];
-
-            if (0 < row && row < 9 && 0 < col && col < 9){
-                ChessPiece other = _board.getPiece(new ChessPosition(row, col));
-                if (other != null){
-                    if (other.getTeamColor() != teamColor && other.getPieceType() == ChessPiece.PieceType.KING){
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // If all the checks are good, then we are good
         return false;
     }
 
