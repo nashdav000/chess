@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -46,7 +45,14 @@ public class ChessBoard {
     public void resetBoard() {
 
         board = new ChessPiece[8][8];
-        ChessPiece.PieceType[] boardOrder = {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK};
+        ChessPiece.PieceType[] boardOrder = {ChessPiece.PieceType.ROOK,
+                                             ChessPiece.PieceType.KNIGHT,
+                                             ChessPiece.PieceType.BISHOP,
+                                             ChessPiece.PieceType.QUEEN,
+                                             ChessPiece.PieceType.KING,
+                                             ChessPiece.PieceType.BISHOP,
+                                             ChessPiece.PieceType.KNIGHT,
+                                             ChessPiece.PieceType.ROOK};
 
         for (int i = 1; i < 9; i++)
         {

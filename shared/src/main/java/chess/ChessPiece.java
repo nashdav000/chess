@@ -98,54 +98,58 @@ public class ChessPiece {
     private Collection<ChessMove> pawnMove(int startRow, int startCol, ChessBoard board){
         Collection<ChessMove> moves = new ArrayList<>();
 
-        int COLORMODIFIER = pieceColor == ChessGame.TeamColor.BLACK ? -1 : 1;
+        int color = pieceColor == ChessGame.TeamColor.BLACK ? -1 : 1;
 
 
         // Forward Movement
-        if (board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol)) == null){
-            moves.addAll(promotionCheck(startRow, startCol, COLORMODIFIER, 0));
+        if (board.getPiece(new ChessPosition(startRow + color, startCol)) == null){
+            moves.addAll(promotionCheck(startRow, startCol, color, 0));
         }
 
         // Double Movement if at starting position
         if ((startRow == 7 && pieceColor == ChessGame.TeamColor.BLACK || startRow == 2 && pieceColor == ChessGame.TeamColor.WHITE)
-                && board.getPiece(new ChessPosition(startRow + (COLORMODIFIER * 2), startCol)) == null
-                && board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol)) == null)
+                && board.getPiece(new ChessPosition(startRow + (color * 2), startCol)) == null
+                && board.getPiece(new ChessPosition(startRow + color, startCol)) == null)
         {
-            moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + (COLORMODIFIER * 2), startCol), null));
+            moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + (color * 2), startCol), null));
         }
 
         // Capture a piece
         if (startCol < 8){ // Edge Detection
-            ChessPiece other = board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol + 1));
-            if (other != null && other.pieceColor != pieceColor){ // If there is a piece and it's not our color
-                moves.addAll(promotionCheck(startRow, startCol, COLORMODIFIER, 1));
+            ChessPiece other = board.getPiece(new ChessPosition(startRow + color, startCol + 1));
+            if (other != null && other.pieceColor != pieceColor){ // If there is a piece, and it's not our color
+                moves.addAll(promotionCheck(startRow, startCol, color, 1));
             }
         }
 
         if (startCol > 1){ // Edge Detection
-            ChessPiece other = board.getPiece(new ChessPosition(startRow + COLORMODIFIER, startCol - 1));
+            ChessPiece other = board.getPiece(new ChessPosition(startRow + color, startCol - 1));
             if (other != null && other.pieceColor != pieceColor){
-                moves.addAll(promotionCheck(startRow, startCol, COLORMODIFIER, -1));
+                moves.addAll(promotionCheck(startRow, startCol, color, -1));
             }
         }
 
         return moves;
     }
 
-    private Collection<ChessMove> promotionCheck(int startRow, int startCol, int COLORMODIFIER, int CAPTUREMODIFIER){
+    private Collection<ChessMove> promotionCheck(int startRow, int startCol, int color, int captureModifier){
 
-        PieceType[] PROMOTIONS = {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
+        PieceType[] promotions = {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
         Collection<ChessMove> moves = new ArrayList<>();
 
         if ((startRow == 7 && pieceColor == ChessGame.TeamColor.WHITE) || (startRow == 2 && pieceColor == ChessGame.TeamColor.BLACK))
         {
-            for (PieceType promo : PROMOTIONS)
+            for (PieceType promo : promotions)
             {
-                moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol + CAPTUREMODIFIER), promo));
+                moves.add(new ChessMove(new ChessPosition(startRow, startCol),
+                          new ChessPosition(startRow + color, startCol + captureModifier),
+                          promo));
             }
         }
         else{
-            moves.add(new ChessMove(new ChessPosition(startRow, startCol), new ChessPosition(startRow + COLORMODIFIER, startCol + CAPTUREMODIFIER), null));
+            moves.add(new ChessMove(new ChessPosition(startRow, startCol),
+                      new ChessPosition(startRow + color, startCol + captureModifier),
+                      null));
         }
 
         return moves;
