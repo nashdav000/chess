@@ -184,17 +184,21 @@ public class ChessGame {
             for (int y = 1; y < 9; y++){
                 ChessPiece piece = _board.getPiece(new ChessPosition(x, y));
 
+                // Checkmate is defined as there are no valid moves. If we can move, there is not a checkmate
                 if (piece == null || piece.getTeamColor() != teamColor){continue;}
 
-//                Collection<ChessMove> moves = piece.pieceMoves(_board, new ChessPosition(x, y));
-//                moves = validMoves(new ChessPosition(x, y));
                 if (!validMoves(new ChessPosition(x, y)).isEmpty()){
                     canMove = true;
                 }
             }
         }
 
-        return !canMove;
+        if (isInCheck(teamColor)){
+            return !canMove;
+        }
+        else{
+            return false; // Stalemate
+        }
     }
 
     /**
@@ -205,7 +209,27 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        boolean canMove = false;
+
+        for (int x = 1; x < 9; x++){
+            for (int y = 1; y < 9; y++){
+                ChessPiece piece = _board.getPiece(new ChessPosition(x, y));
+
+                // Checkmate is defined as there are no valid moves. If we can move, there is not a checkmate
+                if (piece == null || piece.getTeamColor() != teamColor){continue;}
+
+                if (!validMoves(new ChessPosition(x, y)).isEmpty()){
+                    canMove = true;
+                }
+            }
+        }
+
+        if (!isInCheck(teamColor)){
+            return !canMove;
+        }
+        else{
+            return false; // Checkmate
+        }
     }
 
     /**
