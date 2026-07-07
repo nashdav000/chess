@@ -135,12 +135,14 @@ public class ChessGame {
         ChessPosition king = new ChessPosition(1, 1);
 
         // Find the king
+        kingsearch:
         for (int x = 1; x<9; x++){
             for (int y = 1; y<9; y++){
                 ChessPiece piece = _board.getPiece(new ChessPosition(x, y));
 
                 if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING){
                     king = new ChessPosition(x, y);
+                    break kingsearch;
                 }
             }
         }
@@ -152,9 +154,15 @@ public class ChessGame {
                 // If there's a piece of the opposite color
                 if (piece != null && piece.getTeamColor() != teamColor){
                     Collection<ChessMove> moves = piece.pieceMoves(_board, new ChessPosition(x, y));
-                    if (moves.contains(king)){
-                        return true;
+
+                    for (ChessMove move : moves){
+                        ChessPosition pos = move.getEndPosition();
+                        if (pos.equals(king)){
+                            return true;
+                        }
                     }
+
+
                 }
             }
         }
