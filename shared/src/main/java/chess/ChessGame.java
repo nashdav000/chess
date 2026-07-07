@@ -69,6 +69,7 @@ public class ChessGame {
             ChessPosition startPos = move.getStartPosition();
             ChessPosition endPos = move.getEndPosition();
             ChessPiece startPiece = _board.getPiece(startPos);
+            ChessPiece endPiece = _board.getPiece(endPos);
 
             // Move the piece, checking whether it should be promoted or not
             if (move.getPromotionPiece() != null){
@@ -87,7 +88,7 @@ public class ChessGame {
 
             // Undo the fake move
             _board.addPiece(startPos, startPiece);
-            _board.addPiece(endPos, null);
+            _board.addPiece(endPos, endPiece);
         }
 
         return validMoves;
@@ -155,18 +156,17 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() != teamColor){
                     Collection<ChessMove> moves = piece.pieceMoves(_board, new ChessPosition(x, y));
 
+                    // Check if it can capture the king
                     for (ChessMove move : moves){
-                        ChessPosition pos = move.getEndPosition();
-                        if (pos.equals(king)){
+                        if (move.getEndPosition().equals(king)){
                             return true;
                         }
                     }
-
-
                 }
             }
         }
 
+        // If we reach this, it means there are no moves that can capture the king
         return false;
     }
 
