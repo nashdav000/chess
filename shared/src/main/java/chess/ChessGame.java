@@ -82,7 +82,7 @@ public class ChessGame {
             // Remove the piece from where it started
             _board.addPiece(startPos, null);
 
-            if (isInCheck(_turn)){
+            if (isInCheck(piece.getTeamColor())){
                 validMoves.remove(move);
             }
 
@@ -170,7 +170,6 @@ public class ChessGame {
         return false;
     }
 
-
     /**
      * Determines if the given team is in checkmate
      *
@@ -225,7 +224,6 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return _board;
     }
-
 
     @Override
     public boolean equals(Object o) {
