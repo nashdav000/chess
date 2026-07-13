@@ -1,7 +1,11 @@
 package server;
 
+import com.google.gson.Gson;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.RegisterRequest;
+import service.RegisterResult;
+import service.UserService;
 
 public class Server {
 
@@ -11,7 +15,8 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-        javalin.delete("/name/{name}", this::clear);
+        javalin.delete("/clear", this::clear);
+
         javalin.post("/user", this::register);
     }
 
@@ -30,7 +35,10 @@ public class Server {
     }
 
     private void register(Context ctx){
-        System.out.println("Register request received!");
+        RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
+        UserService userService = new UserService();
+        RegisterResult result = userService.register(request);
 
+        return result
     }
 }
