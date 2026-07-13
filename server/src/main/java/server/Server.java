@@ -15,8 +15,6 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-        javalin.delete("/clear", this::clear);
-
         javalin.post("/user", this::register);
     }
 
@@ -30,15 +28,12 @@ public class Server {
         javalin.stop();
     }
 
-    private void clear(Context ctx){
-
-    }
-
     private void register(Context ctx){
         RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
         UserService userService = new UserService();
         RegisterResult result = userService.register(request);
 
-        return result
+        String json = new Gson().toJson(result);
+        ctx.json(json);
     }
 }
