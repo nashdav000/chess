@@ -5,10 +5,26 @@ package dataaccess;
  */
 public class DataAccessException extends Exception{
 
-    public DataAccessException(String message) {
-        super(message);
+    public enum Type{
+        UsernameTaken,
+        Unauthorized,
+        DoesNotExist,
+        BadRequest
     }
-    public DataAccessException(String message, Throwable ex) {
-        super(message, ex);
+
+    private final Type type;
+
+    public DataAccessException(Type type, String message) {
+        super(message);
+        this.type = type;
+    }
+
+    public int toHTTPresponse(){
+        return switch (type){
+            case BadRequest -> 400;
+            case Unauthorized -> 401;
+            case UsernameTaken -> 403;
+            case DoesNotExist -> 500;
+        };
     }
 }

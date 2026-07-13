@@ -58,7 +58,9 @@ public class Server {
     private void logout(Context ctx) throws DataAccessException{
         LogoutRequest request = new LogoutRequest(ctx.header("Authorization"));
 
-        if (request.authToken() == null){throw new DataAccessException("Unauthorized");}
+        if (request.authToken() == null){
+            throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
+        }
 
         LogoutResult result = userService.logout(request);
 
@@ -73,7 +75,7 @@ public class Server {
 
     private void exceptionHandler(DataAccessException ex, Context ctx){
         String json = new Gson().toJson(Map.of("message", ex.getMessage()));
-        ctx.status(400);
+        ctx.status(ex.toHTTPresponse());
         ctx.json(json);
     }
 }

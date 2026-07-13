@@ -19,6 +19,12 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException{
+        // Check if any of the fields are null
+        if (request.username() == null || request.password() == null || request.email() == null){
+            throw new DataAccessException(DataAccessException.Type.BadRequest,
+                    "Error: One or more fields were left blank");
+        }
+
         // Create the user
         UserData user = new UserData(request.username(),
                                      request.password(),
@@ -26,7 +32,7 @@ public class UserService {
 
         // Check if the user exists
         if (userAccess.getUser(user.username()) != null){
-            throw new DataAccessException("Username already taken");
+            throw new DataAccessException(DataAccessException.Type.UsernameTaken, "Error: Username taken");
         }
 
         // Create the user and return a new authentification token
@@ -39,20 +45,27 @@ public class UserService {
         userAccess.clearUsers();
     }
 
-    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
-        UserData attemptedLogin = userAccess.getUser(loginRequest.username());
+    public LoginResult login(LoginRequest request) throws DataAccessException {
+        // One or more fields are null
+        if (request.username() == null || request.password() == null){
+            throw new DataAccessException(DataAccessException.Type.BadRequest,
+                    "Error: One or more fields were left blank.");
+        }
+
+        UserData attemptedLogin = userAccess.getUser(request.username());
 
         // No user with that name exists
         if (attemptedLogin == null){
-            throw new DataAccessException("No user with that username exists");
+            throw new DataAccessException(DataAccessException.Type.Unauthorized,
+                    "Error: No user with that username exists");
         }
 
         // Password doesn't match
-        if (!Objects.equals(attemptedLogin.password(), loginRequest.password())){
-            throw new DataAccessException("Username and password don't match");
+        if (!Objects.equals(attemptedLogin.password(), request.password())){
+            throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
 
-        return new LoginResult(loginRequest.username(), authAccess.createAuth(attemptedLogin.username()));
+        return new LoginResult(request.username(), authAccess.createAuth(attemptedLogin.username()));
     }
 
     public LogoutResult logout(LogoutRequest request) throws DataAccessException {
@@ -65,7 +78,7 @@ public class UserService {
 
     private boolean authorized(String authToken) throws DataAccessException{
         if (authAccess.getAuth(authToken) == null){
-            throw new DataAccessException("Not logged in. Unauthorized");
+            throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
         return true;
     }
