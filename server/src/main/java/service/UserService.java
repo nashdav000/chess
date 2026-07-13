@@ -3,11 +3,9 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
-import model.AuthData;
 import model.UserData;
 
 import java.util.Objects;
-import java.util.UUID;
 
 
 public class UserService {
@@ -16,7 +14,8 @@ public class UserService {
     private final AuthDAO authAccess;
 
     public UserService(UserDAO userAccess, AuthDAO authAccess) {
-        this.userAccess = userAccess; this.authAccess = authAccess;
+        this.userAccess = userAccess;
+        this.authAccess = authAccess;
     }
 
     public RegisterResult register(RegisterRequest request) throws DataAccessException{
@@ -48,15 +47,30 @@ public class UserService {
             throw new DataAccessException("No user with that username exists");
         }
 
+        // No user with that name logged in
+        if (authAccess.getAuth(attemptedLogin.username()) != null){
+            throw new DataAccessException("Already logged in");
+        }
+
         // Password doesn't match
-        if (attemptedLogin.password() != loginRequest.password()){
+        if (!Objects.equals(attemptedLogin.password(), loginRequest.password())){
             throw new DataAccessException("Username and password don't match");
         }
 
         return new LoginResult(loginRequest.username(), authAccess.createAuth(attemptedLogin.username()));
     }
-//
-//    public void logout(LogoutRequest logoutRequest){
-//
-//    }
+
+    public void logout(LogoutRequest request) throws DataAccessException {
+        if (authorized(request.username(), request.authToken())){
+            authAccess.deleteAuth(request.username());
+        }
+    }
+
+    private boolean authorized(String username, String authToken) throws DataAccessException{
+        if (authAccess.getAuth(username) == null) {return false;}
+        if (!Objects.equals(authAccess.getAuth(username), authToken)){
+            throw new DataAccessException("Unauthorized");
+        }
+        return true;
+    }
 }

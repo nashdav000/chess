@@ -8,6 +8,8 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import service.*;
 
+import java.util.Map;
+
 public class Server {
 
     private final Javalin javalin;
@@ -58,7 +60,8 @@ public class Server {
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx){
-
+        String json = new Gson().toJson(Map.of("message", ex.getMessage()));
         ctx.status(400);
+        ctx.json(json);
     }
 }
