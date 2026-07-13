@@ -12,7 +12,7 @@ public class MemoryUserDAO implements UserDAO {
     public void createUser(UserData user) {userStorage.put(user.username(), user);}
 
     @Override
-    public UserData getUser(UserData user) {return userStorage.get(user.username());}
+    public UserData getUser(String username) {return userStorage.get(username);}
 
     public void clearUsers(){
         userStorage = new HashMap<>();

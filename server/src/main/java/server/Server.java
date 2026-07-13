@@ -2,18 +2,16 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
-import service.ClearRequest;
-import service.RegisterRequest;
-import service.RegisterResult;
-import service.UserService;
+import service.*;
 
 public class Server {
 
     private final Javalin javalin;
-    private final UserService userService = new UserService(new MemoryUserDAO());
+    private final UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
     public Server() {
 
@@ -21,6 +19,7 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", this::register);
+        javalin.post("/session", this::login);
         javalin.delete("/db", this::clear);
 
 
@@ -45,12 +44,21 @@ public class Server {
         ctx.json(json);
     }
 
+    private void login(Context ctx) throws DataAccessException{
+        LoginRequest request = new Gson().fromJson(ctx.body(), LoginRequest.class);
+        LoginResult result = userService.login(request);
+
+        String json = new Gson().toJson(result);
+        ctx.json(json);
+    }
+
     private void clear(Context ctx){
        ClearRequest request = new ClearRequest();
        userService.clearUsers(request);
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx){
+
         ctx.status(400);
     }
 }
