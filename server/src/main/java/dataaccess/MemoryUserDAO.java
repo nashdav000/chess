@@ -9,9 +9,7 @@ public class MemoryUserDAO implements UserDAO {
     private final HashMap<String, UserData> userStorage = new HashMap<>();
 
     @Override
-    public void createUser(UserData user) throws DataAccessException {
-        if (userStorage.containsKey(user.username())){throw new DataAccessException("Username already taken");}
-        
+    public void createUser(UserData user) {
         userStorage.put(user.username(), user);
 
         userStorage.forEach((key, value) -> {
@@ -20,8 +18,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public UserData getUser(UserData user) throws DataAccessException {
-        if (!userStorage.containsKey(user.username())){throw new DataAccessException("User does not exist");}
+    public UserData getUser(UserData user) {
         return userStorage.get(user.username());
     }
 }

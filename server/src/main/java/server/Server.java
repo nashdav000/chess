@@ -1,9 +1,11 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryUserDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
+import io.javalin.http.HttpStatus;
 import service.RegisterRequest;
 import service.RegisterResult;
 import service.UserService;
@@ -19,6 +21,9 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", this::register);
+
+
+        javalin.exception(DataAccessException.class, this::exceptionHandler);
     }
 
     public int run(int desiredPort) {
@@ -31,11 +36,15 @@ public class Server {
         javalin.stop();
     }
 
-    private void register(Context ctx){
+    private void register(Context ctx) throws DataAccessException{
         RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
         RegisterResult result = userService.register(request);
 
         String json = new Gson().toJson(result);
         ctx.json(json);
+    }
+
+    private void exceptionHandler(DataAccessException ex, Context ctx){
+        ctx.status(400);
     }
 }

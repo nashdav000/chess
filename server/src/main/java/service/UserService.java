@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
@@ -15,13 +16,16 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public RegisterResult register(RegisterRequest registerRequest){
+    public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException{
         UserData user = new UserData(registerRequest.username(),
                                      registerRequest.password(),
                                      registerRequest.email());
 
-        try{dataAccess.createUser(user);}
-        catch(Exception e){System.out.println(e);}
+        if (dataAccess.getUser(user) != null){
+            throw new DataAccessException("Username already taken");
+        }
+
+        dataAccess.createUser(user);
 
         String authToken = UUID.randomUUID().toString();
         return new RegisterResult(user.username(), new AuthData(authToken, user.username()));
