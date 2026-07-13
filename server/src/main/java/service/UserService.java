@@ -47,11 +47,6 @@ public class UserService {
             throw new DataAccessException("No user with that username exists");
         }
 
-        // No user with that name logged in
-        if (authAccess.getAuth(attemptedLogin.username()) != null){
-            throw new DataAccessException("Already logged in");
-        }
-
         // Password doesn't match
         if (!Objects.equals(attemptedLogin.password(), loginRequest.password())){
             throw new DataAccessException("Username and password don't match");
@@ -60,16 +55,17 @@ public class UserService {
         return new LoginResult(loginRequest.username(), authAccess.createAuth(attemptedLogin.username()));
     }
 
-    public void logout(LogoutRequest request) throws DataAccessException {
-        if (authorized(request.username(), request.authToken())){
-            authAccess.deleteAuth(request.username());
+    public LogoutResult logout(LogoutRequest request) throws DataAccessException {
+        if (authorized(request.authToken())){
+            authAccess.deleteAuth(request.authToken());
         }
+
+        return new LogoutResult();
     }
 
-    private boolean authorized(String username, String authToken) throws DataAccessException{
-        if (authAccess.getAuth(username) == null) {return false;}
-        if (!Objects.equals(authAccess.getAuth(username), authToken)){
-            throw new DataAccessException("Unauthorized");
+    private boolean authorized(String authToken) throws DataAccessException{
+        if (authAccess.getAuth(authToken) == null){
+            throw new DataAccessException("Not logged in. Unauthorized");
         }
         return true;
     }

@@ -22,6 +22,7 @@ public class Server {
         // Register your endpoints and exception handlers here.
         javalin.post("/user", this::register);
         javalin.post("/session", this::login);
+        javalin.delete("/session", this::logout);
         javalin.delete("/db", this::clear);
 
 
@@ -49,6 +50,17 @@ public class Server {
     private void login(Context ctx) throws DataAccessException{
         LoginRequest request = new Gson().fromJson(ctx.body(), LoginRequest.class);
         LoginResult result = userService.login(request);
+
+        String json = new Gson().toJson(result);
+        ctx.json(json);
+    }
+
+    private void logout(Context ctx) throws DataAccessException{
+        LogoutRequest request = new LogoutRequest(ctx.header("Authorization"));
+
+        if (request.authToken() == null){throw new DataAccessException("Unauthorized");}
+
+        LogoutResult result = userService.logout(request);
 
         String json = new Gson().toJson(result);
         ctx.json(json);
