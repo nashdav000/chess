@@ -12,7 +12,7 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.delete("/name/{name}", this::clear);
-        javalin.post("/username/{username}/password/{password}/email/{email}", this::register);
+        javalin.post("/user", this::register);
     }
 
     public int run(int desiredPort) {
@@ -31,5 +31,6 @@ public class Server {
 
     private void register(Context ctx){
         System.out.println("Register request received!");
+
     }
 }
