@@ -7,4 +7,6 @@ public interface UserDAO {
     void createUser(UserData user);
 
     UserData getUser(UserData user);
+
+    void clearUsers();
 }

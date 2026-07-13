@@ -5,7 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.MemoryUserDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
-import io.javalin.http.HttpStatus;
+import service.ClearRequest;
 import service.RegisterRequest;
 import service.RegisterResult;
 import service.UserService;
@@ -21,6 +21,7 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", this::register);
+        javalin.delete("/db", this::clear);
 
 
         javalin.exception(DataAccessException.class, this::exceptionHandler);
@@ -42,6 +43,11 @@ public class Server {
 
         String json = new Gson().toJson(result);
         ctx.json(json);
+    }
+
+    private void clear(Context ctx){
+       ClearRequest request = new ClearRequest();
+       userService.clearUsers(request);
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx){
