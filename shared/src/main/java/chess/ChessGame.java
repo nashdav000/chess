@@ -118,6 +118,8 @@ public class ChessGame {
             gameBoard.addPiece(endPos, new ChessPiece(startPiece.getTeamColor(), move.getPromotionPiece()));
         }
         else{
+// Edit this to make a new piece and then I can use memory hacks for castling
+// ie testing if the king == the piece, because making a new one deletes memory
             gameBoard.addPiece(endPos, startPiece);
         }
 
@@ -221,7 +223,7 @@ public class ChessGame {
                 }
             }
         }
-        
+
         return stuck;
     }
     /**

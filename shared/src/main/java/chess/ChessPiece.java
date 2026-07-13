@@ -129,6 +129,10 @@ public class ChessPiece {
             }
         }
 
+// En Passant
+// Basically if the pawn is in its starting row and there is a pawn next to it
+// of the opposite color, and the space above is clear, capture it
+
         return moves;
     }
 
