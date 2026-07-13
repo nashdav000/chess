@@ -30,7 +30,7 @@ public class UserService {
         // Create the user and return a new authentification token
         dataAccess.createUser(user);
         String authToken = UUID.randomUUID().toString();
-        return new RegisterResult(user.username(), new AuthData(authToken, user.username()));
+        return new RegisterResult(user.username(), authToken);
     }
 
     public void clearUsers(ClearRequest request){
