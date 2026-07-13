@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.MemoryUserDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.RegisterRequest;
@@ -10,8 +11,10 @@ import service.UserService;
 public class Server {
 
     private final Javalin javalin;
+    private final UserService userService = new UserService(new MemoryUserDAO());
 
     public Server() {
+
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
@@ -30,7 +33,6 @@ public class Server {
 
     private void register(Context ctx){
         RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-        UserService userService = new UserService();
         RegisterResult result = userService.register(request);
 
         String json = new Gson().toJson(result);

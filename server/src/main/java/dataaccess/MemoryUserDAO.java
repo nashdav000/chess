@@ -13,6 +13,10 @@ public class MemoryUserDAO implements UserDAO {
         if (userStorage.containsKey(user.username())){throw new DataAccessException("Username already taken");}
         
         userStorage.put(user.username(), user);
+
+        userStorage.forEach((key, value) -> {
+            System.out.println("Key: " + key + ", Value: " + value.password());
+        });
     }
 
     @Override
