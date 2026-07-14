@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import service.GameClasses.GameInfo;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
@@ -26,6 +27,10 @@ public class MemoryGameDAO implements GameDAO {
 
         // Return the ID
         return String.valueOf(ID);
+    }
+
+    public Collection<GameInfo> listGames(){
+        return gameList.values();
     }
 
     public void clearGames(){

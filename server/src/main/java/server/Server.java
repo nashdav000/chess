@@ -25,10 +25,17 @@ public class Server {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
+
+        // User Endpoints
         javalin.post("/user", this::register);
         javalin.post("/session", this::login);
         javalin.delete("/session", this::logout);
+
+        // Game Endpoints
         javalin.post("/game", this::create);
+        javalin.get("/game", this::list);
+
+        // Clear Endpoint
         javalin.delete("/db", this::clear);
 
         javalin.exception(DataAccessException.class, this::exceptionHandler);
@@ -86,6 +93,13 @@ public class Server {
         }
 
         CreateResult result = gameService.createGame(request);
+        String json = new Gson().toJson(result);
+        ctx.json(json);
+    }
+
+    private void list(Context ctx) throws DataAccessException {
+        ListRequest request = new ListRequest(ctx.header("authorization"));
+        ListResult result = gameService.listGames(request);
         String json = new Gson().toJson(result);
         ctx.json(json);
     }

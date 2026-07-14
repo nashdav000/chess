@@ -1,4 +1,4 @@
 package service.GameClasses;
 
-public record ListRequest() {
+public record ListRequest(String authToken) {
 }

@@ -6,6 +6,8 @@ import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import service.GameClasses.*;
 
+import java.util.List;
+
 
 public class GameService {
 
@@ -32,9 +34,11 @@ public class GameService {
 //
 //    }
 //
-//    public ListResult listGames(ListRequest request){
-//
-//    }
+    public ListResult listGames(ListRequest request) throws DataAccessException{
+        authorize(request.authToken());
+
+        return new ListResult(gameAccess.listGames());
+    }
 //
 //    public UpdateResult updateGame(UpdateRequest request){
 //
