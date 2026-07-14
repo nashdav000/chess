@@ -1,4 +1,4 @@
 package service.GameClasses;
 
-public record CreateResult() {
+public record CreateResult(String gameID) {
 }

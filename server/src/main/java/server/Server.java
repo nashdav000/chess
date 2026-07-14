@@ -4,17 +4,21 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
+import dataaccess.MemoryGameDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.*;
 import service.UserClasses.*;
+import service.GameClasses.*;
 
 import java.util.Map;
 
 public class Server {
 
     private final Javalin javalin;
-    private final UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+    private final MemoryAuthDAO memoryAuthDAO = new MemoryAuthDAO();
+    private final UserService userService = new UserService(new MemoryUserDAO(), memoryAuthDAO);
+    private final GameService gameService = new GameService(new MemoryGameDAO(), memoryAuthDAO);
 
     public Server() {
 
@@ -24,6 +28,7 @@ public class Server {
         javalin.post("/user", this::register);
         javalin.post("/session", this::login);
         javalin.delete("/session", this::logout);
+        javalin.post("/game", this::create);
         javalin.delete("/db", this::clear);
 
         javalin.exception(DataAccessException.class, this::exceptionHandler);
@@ -56,7 +61,7 @@ public class Server {
     }
 
     private void logout(Context ctx) throws DataAccessException{
-        LogoutRequest request = new LogoutRequest(ctx.header("Authorization"));
+        LogoutRequest request = new LogoutRequest(ctx.header("authorization"));
 
         if (request.authToken() == null){
             throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
@@ -65,6 +70,24 @@ public class Server {
         userService.logout(request);
 
         ctx.json("");
+    }
+
+    private void create(Context ctx) throws DataAccessException {
+        // Temp class to read in json object
+        record string(String gameName){}
+        string body = new Gson().fromJson(ctx.body(), string.class);
+        String head = ctx.header("authorization");
+        CreateRequest request = new CreateRequest(head, body.gameName);
+
+        // Validate data
+        if (request.authToken() == null || request.gameName() == null){
+            throw new DataAccessException(DataAccessException.Type.BadRequest,
+                    "Error: Bad Request");
+        }
+
+        CreateResult result = gameService.createGame(request);
+        String json = new Gson().toJson(result);
+        ctx.json(json);
     }
 
     private void clear(Context ctx){

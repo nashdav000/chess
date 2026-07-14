@@ -13,8 +13,8 @@ public class MemoryAuthDAO implements AuthDAO {
         return authToken;
     }
 
-    public String getAuth(String username) {
-        return activeUsers.get(username);
+    public String getAuth(String authToken) {
+        return activeUsers.get(authToken);
     }
 
     public void deleteAuth(String authToken) {

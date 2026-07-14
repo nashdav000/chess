@@ -1,22 +1,45 @@
 package service;
 
+import chess.ChessGame;
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import service.GameClasses.*;
+
 
 public class GameService {
 
-    public CreateResult createGame(CreateRequest request){
+    private final GameDAO gameAccess;
+    private final AuthDAO authAccess;
 
+    public GameService(GameDAO gameAccess, AuthDAO authAccess) {
+        this.gameAccess = gameAccess;
+        this.authAccess = authAccess;
     }
 
-    public GetResult getGame(GetRequest request){
+    public CreateResult createGame(CreateRequest request) throws DataAccessException{
+        // Make sure the user is authorized
+        authorize(request.authToken());
 
+        return new CreateResult(gameAccess.createGame(request.gameName()));
     }
 
-    public ListResult listGames(ListRequest request){
+//    public GetResult getGame(GetRequest request){
+//
+//    }
+//
+//    public ListResult listGames(ListRequest request){
+//
+//    }
+//
+//    public UpdateResult updateGame(UpdateRequest request){
+//
+//    }
 
-    }
-
-    public UpdateResult updateGame(UpdateRequest request){
-
+    private void authorize(String authToken) throws DataAccessException{
+        if (authAccess.getAuth(authToken) == null){
+            throw new DataAccessException(DataAccessException.Type.Unauthorized,
+                                            "Error: Unauthorized");
+        }
     }
 }
