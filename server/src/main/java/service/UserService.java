@@ -28,7 +28,7 @@ public class UserService {
 
         // Check if the user exists
         if (userAccess.getUser(request.username()) != null){
-            throw new DataAccessException(DataAccessException.Type.UsernameTaken, "Error: Username taken");
+            throw new DataAccessException(DataAccessException.Type.AlreadyTaken, "Error: Username taken");
         }
 
         // Create the user

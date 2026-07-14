@@ -33,6 +33,14 @@ public class MemoryGameDAO implements GameDAO {
         return gameList.values();
     }
 
+    public GameInfo getGame(String gameID){
+        return gameList.get(gameID);
+    }
+
+    public void setGame(String gameID, GameInfo game){
+        gameList.put(gameID, game);
+    }
+
     public void clearGames(){
         gameList = new HashMap<>();
     }

@@ -1,4 +1,4 @@
 package service.GameClasses;
 
-public record GetRequest() {
+public record JoinResult() {
 }

@@ -6,7 +6,7 @@ package dataaccess;
 public class DataAccessException extends Exception{
 
     public enum Type{
-        UsernameTaken,
+        AlreadyTaken,
         Unauthorized,
         DoesNotExist,
         BadRequest
@@ -23,7 +23,7 @@ public class DataAccessException extends Exception{
         return switch (type){
             case BadRequest -> 400;
             case Unauthorized -> 401;
-            case UsernameTaken -> 403;
+            case AlreadyTaken -> 403;
             case DoesNotExist -> 500;
         };
     }

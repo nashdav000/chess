@@ -34,6 +34,7 @@ public class Server {
         // Game Endpoints
         javalin.post("/game", this::create);
         javalin.get("/game", this::list);
+        javalin.put("/game", this::join);
 
         // Clear Endpoint
         javalin.delete("/db", this::clear);
@@ -81,8 +82,8 @@ public class Server {
 
     private void create(Context ctx) throws DataAccessException {
         // Temp class to read in json object
-        record string(String gameName){}
-        string body = new Gson().fromJson(ctx.body(), string.class);
+        record info(String gameName){}
+        info body = new Gson().fromJson(ctx.body(), info.class);
         String head = ctx.header("authorization");
         CreateRequest request = new CreateRequest(head, body.gameName);
 
@@ -100,6 +101,15 @@ public class Server {
     private void list(Context ctx) throws DataAccessException {
         ListRequest request = new ListRequest(ctx.header("authorization"));
         ListResult result = gameService.listGames(request);
+        String json = new Gson().toJson(result);
+        ctx.json(json);
+    }
+
+    private void join(Context ctx) throws DataAccessException {
+        record info(String playerColor, String gameID){}
+        info body = new Gson().fromJson(ctx.body(), info.class);
+        JoinRequest request = new JoinRequest(ctx.header("authorization"), body.playerColor, body.gameID);
+        JoinResult result = gameService.joinGame(request);
         String json = new Gson().toJson(result);
         ctx.json(json);
     }
