@@ -62,15 +62,13 @@ public class Server {
             throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
 
-        LogoutResult result = userService.logout(request);
+        userService.logout(request);
 
-        String json = new Gson().toJson(result);
-        ctx.json(json);
+        ctx.json("");
     }
 
     private void clear(Context ctx){
-       ClearRequest request = new ClearRequest();
-       userService.clearUsers(request);
+       userService.clearUsers();
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx){

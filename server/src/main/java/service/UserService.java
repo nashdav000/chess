@@ -42,7 +42,7 @@ public class UserService {
         return new RegisterResult(user.username(), authToken);
     }
 
-    public void clearUsers(ClearRequest request){
+    public void clearUsers(){
         userAccess.clearUsers();
     }
 
@@ -68,13 +68,11 @@ public class UserService {
                 authAccess.createAuth(request.username()));
     }
 
-    public LogoutResult logout(LogoutRequest request) throws DataAccessException {
+    public void logout(LogoutRequest request) throws DataAccessException {
         if (authAccess.getAuth(request.authToken()) == null){
             throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
 
         authAccess.deleteAuth(request.authToken());
-
-        return new LogoutResult();
     }
 }
