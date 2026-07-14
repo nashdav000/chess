@@ -24,6 +24,10 @@ public class GameService {
         return new CreateResult(gameAccess.createGame(request.gameName()));
     }
 
+    public void clearGames(){
+        gameAccess.clearGames();
+    }
+
 //    public GetResult getGame(GetRequest request){
 //
 //    }

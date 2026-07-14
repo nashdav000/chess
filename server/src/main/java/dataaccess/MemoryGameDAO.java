@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
 
-    private final HashMap<String, GameInfo> gameList = new HashMap<>();
+    private HashMap<String, GameInfo> gameList = new HashMap<>();
 
     public String createGame(String gameName){
         ChessGame chessGame = new ChessGame();
@@ -26,5 +26,9 @@ public class MemoryGameDAO implements GameDAO {
 
         // Return the ID
         return String.valueOf(ID);
+    }
+
+    public void clearGames(){
+        gameList = new HashMap<>();
     }
 }

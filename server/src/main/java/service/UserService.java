@@ -46,6 +46,8 @@ public class UserService {
         userAccess.clearUsers();
     }
 
+    public void clearAuths() {authAccess.clearAuth();}
+
     public LoginResult login(LoginRequest request) throws DataAccessException {
         // One or more fields are null
         if (request.username() == null || request.password() == null){

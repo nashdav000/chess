@@ -92,6 +92,8 @@ public class Server {
 
     private void clear(Context ctx){
        userService.clearUsers();
+       userService.clearAuths();
+       gameService.clearGames();
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx){
