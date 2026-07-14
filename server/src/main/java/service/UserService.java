@@ -4,6 +4,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.UserData;
+import service.UserClasses.*;
 
 import java.util.Objects;
 
@@ -25,18 +26,18 @@ public class UserService {
                     "Error: One or more fields were left blank");
         }
 
-        // Create the user
-        UserData user = new UserData(request.username(),
-                                     request.password(),
-                                     request.email());
-
         // Check if the user exists
-        if (userAccess.getUser(user.username()) != null){
+        if (userAccess.getUser(request.username()) != null){
             throw new DataAccessException(DataAccessException.Type.UsernameTaken, "Error: Username taken");
         }
 
-        // Create the user and return a new authentification token
+        // Create the user
+        UserData user = new UserData(request.username(),
+                request.password(),
+                request.email());
         userAccess.createUser(user);
+
+        // Return a new authentification token
         String authToken = authAccess.createAuth(user.username());
         return new RegisterResult(user.username(), authToken);
     }
@@ -52,34 +53,28 @@ public class UserService {
                     "Error: One or more fields were left blank.");
         }
 
-        UserData attemptedLogin = userAccess.getUser(request.username());
-
         // No user with that name exists
-        if (attemptedLogin == null){
+        if (userAccess.getUser(request.username()) == null){
             throw new DataAccessException(DataAccessException.Type.Unauthorized,
                     "Error: No user with that username exists");
         }
 
         // Password doesn't match
-        if (!Objects.equals(attemptedLogin.password(), request.password())){
+        if (!Objects.equals(userAccess.getUser(request.username()).password(), request.password())){
             throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
 
-        return new LoginResult(request.username(), authAccess.createAuth(attemptedLogin.username()));
+        return new LoginResult(request.username(),
+                authAccess.createAuth(request.username()));
     }
 
     public LogoutResult logout(LogoutRequest request) throws DataAccessException {
-        if (authorized(request.authToken())){
-            authAccess.deleteAuth(request.authToken());
-        }
-
-        return new LogoutResult();
-    }
-
-    private boolean authorized(String authToken) throws DataAccessException{
-        if (authAccess.getAuth(authToken) == null){
+        if (authAccess.getAuth(request.authToken()) == null){
             throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
-        return true;
+
+        authAccess.deleteAuth(request.authToken());
+
+        return new LogoutResult();
     }
 }

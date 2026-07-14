@@ -7,6 +7,7 @@ import dataaccess.MemoryUserDAO;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.*;
+import service.UserClasses.*;
 
 import java.util.Map;
 
@@ -24,7 +25,6 @@ public class Server {
         javalin.post("/session", this::login);
         javalin.delete("/session", this::logout);
         javalin.delete("/db", this::clear);
-
 
         javalin.exception(DataAccessException.class, this::exceptionHandler);
     }
@@ -75,7 +75,7 @@ public class Server {
 
     private void exceptionHandler(DataAccessException ex, Context ctx){
         String json = new Gson().toJson(Map.of("message", ex.getMessage()));
-        ctx.status(ex.toHTTPresponse());
+        ctx.status(ex.toHTTPResponse());
         ctx.json(json);
     }
 }

@@ -1,4 +1,4 @@
-package service;
+package service.UserClasses;
 
 public record RegisterRequest(String username, String password, String email) {
 }

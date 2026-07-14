@@ -19,7 +19,7 @@ public class DataAccessException extends Exception{
         this.type = type;
     }
 
-    public int toHTTPresponse(){
+    public int toHTTPResponse(){
         return switch (type){
             case BadRequest -> 400;
             case Unauthorized -> 401;
