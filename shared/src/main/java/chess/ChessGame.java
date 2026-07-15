@@ -155,15 +155,17 @@ public class ChessGame {
             for (int y = 1; y<9; y++){
                 ChessPiece piece = gameBoard.getPiece(new ChessPosition(x, y));
 
+                Collection<ChessMove> moves;
                 // If there's a piece of the opposite color
-                if (piece != null && piece.getTeamColor() != teamColor){
-                    Collection<ChessMove> moves = piece.pieceMoves(gameBoard, new ChessPosition(x, y));
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    moves = piece.pieceMoves(gameBoard, new ChessPosition(x, y));
+                }
+                else{continue;}
 
-                    // Check if it can capture the king
-                    for (ChessMove move : moves){
-                        if (move.getEndPosition().equals(king)){
-                            return true;
-                        }
+                // Check if it can capture the king
+                for (ChessMove move : moves){
+                    if (move.getEndPosition().equals(king)){
+                        return true;
                     }
                 }
             }
