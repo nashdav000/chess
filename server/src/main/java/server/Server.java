@@ -17,12 +17,12 @@ public class Server {
     // once database is implemented update all the calls to be tertiary determinants on which to use
 
     private final Javalin javalin;
-    private final AuthDAO authDAO = new MemoryAuthDAO();
-    private final UserDAO userDAO = new MemoryUserDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
+    private final static AuthDAO AUTH_DAO = new MemoryAuthDAO();
+    private final static UserDAO USER_DAO = new MemoryUserDAO();
+    private final static GameDAO GAME_DAO = new MemoryGameDAO();
 
-    private final UserService userService = new UserService(userDAO, authDAO);
-    private final GameService gameService = new GameService(gameDAO, authDAO);
+    private final static UserService USER_SERVICE = new UserService(USER_DAO, AUTH_DAO);
+    private final static GameService GAME_SERVICE = new GameService(GAME_DAO, AUTH_DAO);
 
     public Server() {
 
@@ -58,7 +58,7 @@ public class Server {
 
     private void register(Context ctx) throws DataAccessException{
         RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-        RegisterResult result = userService.register(request);
+        RegisterResult result = USER_SERVICE.register(request);
 
         String json = new Gson().toJson(result);
         ctx.json(json);
@@ -66,7 +66,7 @@ public class Server {
 
     private void login(Context ctx) throws DataAccessException{
         LoginRequest request = new Gson().fromJson(ctx.body(), LoginRequest.class);
-        LoginResult result = userService.login(request);
+        LoginResult result = USER_SERVICE.login(request);
 
         String json = new Gson().toJson(result);
         ctx.json(json);
@@ -79,15 +79,15 @@ public class Server {
             throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
 
-        userService.logout(request);
+        USER_SERVICE.logout(request);
 
         ctx.json("");
     }
 
     private void create(Context ctx) throws DataAccessException {
         // Temp class to read in json object
-        record info(String gameName){}
-        info body = new Gson().fromJson(ctx.body(), info.class);
+        record Info(String gameName){}
+        Info body = new Gson().fromJson(ctx.body(), Info.class);
         String head = ctx.header("authorization");
         CreateRequest request = new CreateRequest(head, body.gameName);
 
@@ -97,31 +97,31 @@ public class Server {
                     "Error: Bad Request");
         }
 
-        CreateResult result = gameService.createGame(request);
+        CreateResult result = GAME_SERVICE.createGame(request);
         String json = new Gson().toJson(result);
         ctx.json(json);
     }
 
     private void list(Context ctx) throws DataAccessException {
         ListRequest request = new ListRequest(ctx.header("authorization"));
-        ListResult result = gameService.listGames(request);
+        ListResult result = GAME_SERVICE.listGames(request);
         String json = new Gson().toJson(result);
         ctx.json(json);
     }
 
     private void join(Context ctx) throws DataAccessException {
-        record info(String playerColor, String gameID){}
-        info body = new Gson().fromJson(ctx.body(), info.class);
+        record Info(String playerColor, String gameID){}
+        Info body = new Gson().fromJson(ctx.body(), Info.class);
         JoinRequest request = new JoinRequest(ctx.header("authorization"), body.playerColor, body.gameID);
-        JoinResult result = gameService.joinGame(request);
+        JoinResult result = GAME_SERVICE.joinGame(request);
         String json = new Gson().toJson(result);
         ctx.json(json);
     }
 
     private void clear(Context ctx){
-       userService.clearUsers();
-       userService.clearAuths();
-       gameService.clearGames();
+       USER_SERVICE.clearUsers();
+       USER_SERVICE.clearAuths();
+       GAME_SERVICE.clearGames();
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx){

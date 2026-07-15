@@ -6,23 +6,23 @@ import service.user.classes.LogoutRequest;
 import service.user.classes.RegisterRequest;
 
 public class LogoutTests {
-    private final UserDAO userDAO = new MemoryUserDAO();
-    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final static UserDAO USER_DAO = new MemoryUserDAO();
+    private final static AuthDAO AUTH_DAO = new MemoryAuthDAO();
 
-    private final UserService service = new UserService(userDAO, authDAO);
+    private final static UserService SERVICE = new UserService(USER_DAO, AUTH_DAO);
     private String authToken;
 
     @BeforeEach
     public void init() throws DataAccessException {
-        service.clearUsers();
-        service.clearAuths();
+        SERVICE.clearUsers();
+        SERVICE.clearAuths();
 
         String username = "Broski";
         String password = "password";
         String email = "test@email.com";
 
         RegisterRequest request = new RegisterRequest(username, password, email);
-        authToken = service.register(request).authToken();
+        authToken = SERVICE.register(request).authToken();
     }
 
     @Test
@@ -30,7 +30,7 @@ public class LogoutTests {
     public void logoutExistingUser(){
         Assertions.assertDoesNotThrow(()->{
             LogoutRequest request = new LogoutRequest(authToken);
-            service.logout(request);
+            SERVICE.logout(request);
         });
     }
 
@@ -39,7 +39,7 @@ public class LogoutTests {
     public void logoutUnauthorized(){
         Assertions.assertThrows(DataAccessException.class, ()->{
             LogoutRequest request = new LogoutRequest("badAuthToken");
-            service.logout(request);
+            SERVICE.logout(request);
         });
     }
 }

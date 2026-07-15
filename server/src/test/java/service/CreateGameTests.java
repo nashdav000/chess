@@ -6,11 +6,11 @@ import service.game.classes.CreateRequest;
 import service.user.classes.RegisterRequest;
 
 public class CreateGameTests {
-    private final static AuthDAO authDAO = new MemoryAuthDAO();
-    private final static UserDAO userDAO = new MemoryUserDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
+    private final static AuthDAO AUTH_DAO = new MemoryAuthDAO();
+    private final static UserDAO USER_DAO = new MemoryUserDAO();
+    private final static GameDAO GAMEDAO = new MemoryGameDAO();
 
-    private final GameService gameService = new GameService(gameDAO, authDAO);
+    private final static GameService GAME_SERVICE = new GameService(GAMEDAO, AUTH_DAO);
     private static String authToken;
 
     @BeforeAll
@@ -18,7 +18,7 @@ public class CreateGameTests {
         String username = "Broski";
         String password = "password";
         String email = "test@email.com";
-        UserService userService = new UserService(userDAO, authDAO);
+        UserService userService = new UserService(USER_DAO, AUTH_DAO);
 
         RegisterRequest request = new RegisterRequest(username, password, email);
         authToken = userService.register(request).authToken();
@@ -28,7 +28,7 @@ public class CreateGameTests {
     @DisplayName("Create: Successful")
     public void createSuccessful() throws Exception{
         CreateRequest request = new CreateRequest(authToken, "game");
-        String testID = gameService.createGame(request).gameID();
+        String testID = GAME_SERVICE.createGame(request).gameID();
         Assertions.assertNotNull(testID);
     }
 
@@ -37,7 +37,7 @@ public class CreateGameTests {
     public void createBadRequest(){
         Assertions.assertThrows(DataAccessException.class, () -> {
             CreateRequest request = new CreateRequest(authToken, null);
-            gameService.createGame(request);
+            GAME_SERVICE.createGame(request);
         });
     }
 
@@ -46,7 +46,7 @@ public class CreateGameTests {
     public void createUnauthorized(){
         Assertions.assertThrows(DataAccessException.class, () -> {
             CreateRequest request = new CreateRequest("hacker123", "game");
-            gameService.createGame(request);
+            GAME_SERVICE.createGame(request);
         });
     }
 }
