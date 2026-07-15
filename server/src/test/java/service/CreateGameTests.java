@@ -49,6 +49,9 @@ public class CreateGameTests {
     @Test
     @DisplayName("Create: Unauthorized")
     public void createUnauthorized(){
-
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            CreateRequest request = new CreateRequest("hacker123", "game");
+            gameService.createGame(request);
+        });
     }
 }
