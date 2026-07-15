@@ -1,29 +1,24 @@
 package service;
 
 import dataaccess.*;
-import model.GameData;
 import org.junit.jupiter.api.*;
 import service.GameClasses.CreateRequest;
 import service.UserClasses.RegisterRequest;
 
 public class CreateGameTests {
-    private final AuthDAO authDAO = new MemoryAuthDAO();
-    private final UserDAO userDAO = new MemoryUserDAO();
+    private final static AuthDAO authDAO = new MemoryAuthDAO();
+    private final static UserDAO userDAO = new MemoryUserDAO();
     private final GameDAO gameDAO = new MemoryGameDAO();
 
-    private final UserService userService = new UserService(userDAO, authDAO);
     private final GameService gameService = new GameService(gameDAO, authDAO);
-    private String username;
-    private String authToken;
+    private static String authToken;
 
-    @BeforeEach
-    public void init() throws DataAccessException {
-        userService.clearUsers();
-        userService.clearAuths();
-
-        username = "Broski";
+    @BeforeAll
+    public static void init() throws DataAccessException {
+        String username = "Broski";
         String password = "password";
         String email = "test@email.com";
+        UserService userService = new UserService(userDAO, authDAO);
 
         RegisterRequest request = new RegisterRequest(username, password, email);
         authToken = userService.register(request).authToken();
