@@ -35,13 +35,13 @@ public class RegisterTests {
     @DisplayName("Register: Bad Request")
     public void registerUserBadRequest(){
         RegisterRequest r1 = new RegisterRequest(username, password, null);
-        Assertions.assertThrows(DataAccessException.class, () -> {service.register(r1);});
+        Assertions.assertThrows(DataAccessException.class, () -> service.register(r1));
 
         RegisterRequest r2 = new RegisterRequest(username, null, email);
-        Assertions.assertThrows(DataAccessException.class, () -> {service.register(r2);});
+        Assertions.assertThrows(DataAccessException.class, () -> service.register(r2));
 
         RegisterRequest r3 = new RegisterRequest(null, password, email);
-        Assertions.assertThrows(DataAccessException.class, () -> {service.register(r3);});
+        Assertions.assertThrows(DataAccessException.class, () -> service.register(r3));
     }
 
     @Test
@@ -51,10 +51,10 @@ public class RegisterTests {
 
         Assertions.assertThrows(DataAccessException.class, () -> {
             RegisterRequest request = new RegisterRequest(username, password, email);
-            RegisterResult result = service.register(request);
+            service.register(request);
 
             RegisterRequest newUser = new RegisterRequest(username, password, email);
-            RegisterResult newResult = service.register(newUser);
+            service.register(newUser);
         });
     }
 

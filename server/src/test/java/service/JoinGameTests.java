@@ -101,7 +101,7 @@ public class JoinGameTests {
         // Player 2 joins as white
         Assertions.assertThrows(DataAccessException.class, () ->{
             JoinRequest newJoin = new JoinRequest(newAuth, "WHITE", testID);
-            gameService.joinGame(request);
+            gameService.joinGame(newJoin);
         });
 
     }
