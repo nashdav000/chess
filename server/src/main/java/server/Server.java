@@ -2,9 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
-import dataaccess.MemoryGameDAO;
+import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.*;
@@ -15,10 +13,16 @@ import java.util.Map;
 
 public class Server {
 
+    // private final boolean memory = true;
+    // once database is implemented update all the calls to be tertiary determinants on which to use
+
     private final Javalin javalin;
-    private final MemoryAuthDAO memoryAuthDAO = new MemoryAuthDAO();
-    private final UserService userService = new UserService(new MemoryUserDAO(), memoryAuthDAO);
-    private final GameService gameService = new GameService(new MemoryGameDAO(), memoryAuthDAO);
+    private final AuthDAO authDAO = new MemoryAuthDAO();
+    private final UserDAO userDAO = new MemoryUserDAO();
+    private final GameDAO gameDAO = new MemoryGameDAO();
+
+    private final UserService userService = new UserService(userDAO, authDAO);
+    private final GameService gameService = new GameService(gameDAO, authDAO);
 
     public Server() {
 
