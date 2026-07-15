@@ -3,6 +3,7 @@ package service;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import model.GameData;
 import service.GameClasses.*;
 
 
@@ -42,8 +43,8 @@ public class GameService {
         }
 
         // Get the game
-        GameInfo game = gameAccess.getGame(request.gameID());
-        GameInfo updatedGame = game;
+        GameData game = gameAccess.getGame(request.gameID());
+        GameData updatedGame = game;
 
 //        System.out.println("authToken");
 //        System.out.println(request.authToken());
@@ -59,7 +60,7 @@ public class GameService {
                 }
 
                 // Add player
-                updatedGame = new GameInfo(game.gameID(), game.whiteUsername(),
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(),
                                 authAccess.getAuth(request.authToken()), game.gameName(), game.chessGame());
 
                 break;
@@ -73,7 +74,7 @@ public class GameService {
                 }
 
                 // Add player
-                updatedGame = new GameInfo(game.gameID(),
+                updatedGame = new GameData(game.gameID(),
                         authAccess.getAuth(request.authToken()),
                         game.blackUsername(), game.gameName(), game.chessGame());
                 break;

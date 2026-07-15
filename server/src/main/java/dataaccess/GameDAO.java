@@ -1,17 +1,16 @@
 package dataaccess;
 
-import chess.ChessGame;
-import service.GameClasses.GameInfo;
+import model.GameData;
 import java.util.Collection;
 
 public interface GameDAO {
     String createGame(String gameName);
 
-    Collection<GameInfo> listGames();
+    Collection<GameData> listGames();
 
-    GameInfo getGame(String gameID);
+    GameData getGame(String gameID);
 
-    void setGame(String gameID, GameInfo game);
+    void setGame(String gameID, GameData game);
 
     void clearGames();
 }

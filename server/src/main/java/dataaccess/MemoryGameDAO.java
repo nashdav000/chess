@@ -1,14 +1,13 @@
 package dataaccess;
 
 import chess.ChessGame;
-import service.GameClasses.GameInfo;
-
+import model.GameData;
 import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
 
-    private HashMap<String, GameInfo> gameList = new HashMap<>();
+    private HashMap<String, GameData> gameList = new HashMap<>();
 
     public String createGame(String gameName){
         ChessGame chessGame = new ChessGame();
@@ -20,7 +19,7 @@ public class MemoryGameDAO implements GameDAO {
         }
 
         // Store all the information of the new game
-        GameInfo newGame = new GameInfo(String.valueOf(ID), null, null, gameName, chessGame);
+        GameData newGame = new GameData(String.valueOf(ID), null, null, gameName, chessGame);
 
         // Store it in memory
         gameList.put(String.valueOf(ID), newGame);
@@ -29,15 +28,15 @@ public class MemoryGameDAO implements GameDAO {
         return String.valueOf(ID);
     }
 
-    public Collection<GameInfo> listGames(){
+    public Collection<GameData> listGames(){
         return gameList.values();
     }
 
-    public GameInfo getGame(String gameID){
+    public GameData getGame(String gameID){
         return gameList.get(gameID);
     }
 
-    public void setGame(String gameID, GameInfo game){
+    public void setGame(String gameID, GameData game){
         gameList.put(gameID, game);
     }
 
