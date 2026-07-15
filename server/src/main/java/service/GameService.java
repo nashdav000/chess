@@ -1,12 +1,9 @@
 package service;
 
-import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import service.GameClasses.*;
-
-import java.util.List;
 
 
 public class GameService {
@@ -48,15 +45,21 @@ public class GameService {
         GameInfo game = gameAccess.getGame(request.gameID());
         GameInfo updatedGame = game;
 
+//        System.out.println("authToken");
+//        System.out.println(request.authToken());
+//        System.out.println("username");
+//        System.out.println(authAccess.getAuth(request.authToken()));
+
         switch (request.playerColor()){
             case "BLACK":
                 // Validate color
-                if (game.black() != null){
+                if (game.blackUsername() != null){
                     throw new DataAccessException(DataAccessException.Type.AlreadyTaken,
                             "Error: already taken");
                 }
 
-                updatedGame = new GameInfo(game.gameID(), game.white(),
+                // Add player
+                updatedGame = new GameInfo(game.gameID(), game.whiteUsername(),
                                 authAccess.getAuth(request.authToken()), game.gameName(), game.chessGame());
 
                 break;
@@ -64,14 +67,15 @@ public class GameService {
             case "WHITE":
 
                 // Validate color
-                if (game.white() != null){
+                if (game.whiteUsername() != null){
                     throw new DataAccessException(DataAccessException.Type.AlreadyTaken,
                             "Error: already taken");
                 }
 
+                // Add player
                 updatedGame = new GameInfo(game.gameID(),
                         authAccess.getAuth(request.authToken()),
-                        game.black(), game.gameName(), game.chessGame());
+                        game.blackUsername(), game.gameName(), game.chessGame());
                 break;
         }
 
@@ -84,10 +88,6 @@ public class GameService {
 
         return new ListResult(gameAccess.listGames());
     }
-//
-//    public UpdateResult updateGame(UpdateRequest request){
-//
-//    }
 
     private void authorize(String authToken) throws DataAccessException{
         if (authAccess.getAuth(authToken) == null){
