@@ -48,12 +48,12 @@ public class GameService {
 
         // Get the game
         GameData game = gameAccess.getGame(request.gameID());
-        GameData updatedGame = game;
+        if (game == null){
+            throw new DataAccessException(DataAccessException.Type.BadRequest,
+                    "Error: Game ID does not exist");
+        }
 
-//        System.out.println("authToken");
-//        System.out.println(request.authToken());
-//        System.out.println("username");
-//        System.out.println(authAccess.getAuth(request.authToken()));
+        GameData updatedGame = game;
 
         switch (request.playerColor()){
             case "BLACK":
