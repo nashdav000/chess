@@ -3,8 +3,8 @@ package service;
 import dataaccess.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.*;
-import service.userClasses.RegisterRequest;
-import service.userClasses.RegisterResult;
+import service.user.classes.RegisterRequest;
+import service.user.classes.RegisterResult;
 
 public class RegisterTests {
     private final UserDAO userDAO = new MemoryUserDAO();
