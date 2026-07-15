@@ -21,6 +21,10 @@ public class GameService {
         // Make sure the user is authorized
         authorize(request.authToken());
 
+        if (request.gameName() == null){
+            throw new DataAccessException(DataAccessException.Type.BadRequest,
+                    "Error: Game name is blank");
+        }
         return new CreateResult(gameAccess.createGame(request.gameName()));
     }
 
