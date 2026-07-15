@@ -13,31 +13,31 @@ public class MemoryGameDAO implements GameDAO {
         ChessGame chessGame = new ChessGame();
 
         // Assign it an untaken ID
-        int ID = 1;
-        while (gameList.containsKey(String.valueOf(ID))){
-            ID++;
+        int id = 1;
+        while (gameList.containsKey(String.valueOf(id))){
+            id++;
         }
 
         // Store all the information of the new game
-        GameData newGame = new GameData(String.valueOf(ID), null, null, gameName, chessGame);
+        GameData newGame = new GameData(String.valueOf(id), null, null, gameName, chessGame);
 
         // Store it in memory
-        gameList.put(String.valueOf(ID), newGame);
+        gameList.put(String.valueOf(id), newGame);
 
         // Return the ID
-        return String.valueOf(ID);
+        return String.valueOf(id);
     }
 
     public Collection<GameData> listGames(){
         return gameList.values();
     }
 
-    public GameData getGame(String gameID){
-        return gameList.get(gameID);
+    public GameData getGame(String gameid){
+        return gameList.get(gameid);
     }
 
-    public void setGame(String gameID, GameData game){
-        gameList.put(gameID, game);
+    public void setGame(String gameid, GameData game){
+        gameList.put(gameid, game);
     }
 
     public void clearGames(){
