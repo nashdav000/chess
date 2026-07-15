@@ -4,9 +4,9 @@ import dataaccess.*;
 import model.GameData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.*;
-import service.GameClasses.CreateRequest;
-import service.GameClasses.ListRequest;
-import service.UserClasses.RegisterRequest;
+import service.gameClasses.CreateRequest;
+import service.gameClasses.ListRequest;
+import service.userClasses.RegisterRequest;
 
 import java.util.Collection;
 

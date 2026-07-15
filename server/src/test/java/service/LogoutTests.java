@@ -2,8 +2,8 @@ package service;
 
 import dataaccess.*;
 import org.junit.jupiter.api.*;
-import service.UserClasses.LogoutRequest;
-import service.UserClasses.RegisterRequest;
+import service.userClasses.LogoutRequest;
+import service.userClasses.RegisterRequest;
 
 public class LogoutTests {
     private final UserDAO userDAO = new MemoryUserDAO();

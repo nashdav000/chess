@@ -4,7 +4,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.UserData;
-import service.UserClasses.*;
+import service.userClasses.*;
 
 import java.util.Objects;
 

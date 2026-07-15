@@ -1,4 +1,4 @@
-package service.GameClasses;
+package service.gameClasses;
 
 import model.GameData;
 import java.util.Collection;

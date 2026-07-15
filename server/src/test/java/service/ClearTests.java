@@ -3,8 +3,8 @@ package service;
 import dataaccess.*;
 import model.*;
 import org.junit.jupiter.api.*;
-import service.GameClasses.CreateRequest;
-import service.UserClasses.RegisterRequest;
+import service.gameClasses.CreateRequest;
+import service.userClasses.RegisterRequest;
 
 public class ClearTests {
     private final AuthDAO authDAO = new MemoryAuthDAO();

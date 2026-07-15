@@ -2,8 +2,8 @@ package service;
 
 import dataaccess.*;
 import org.junit.jupiter.api.*;
-import service.GameClasses.CreateRequest;
-import service.UserClasses.RegisterRequest;
+import service.gameClasses.CreateRequest;
+import service.userClasses.RegisterRequest;
 
 public class CreateGameTests {
     private final static AuthDAO authDAO = new MemoryAuthDAO();

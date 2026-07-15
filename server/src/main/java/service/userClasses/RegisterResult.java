@@ -1,4 +1,4 @@
-package service.UserClasses;
+package service.userClasses;
 
 public record RegisterResult(String username, String authToken) {
 }
