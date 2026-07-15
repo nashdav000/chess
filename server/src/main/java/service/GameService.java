@@ -4,7 +4,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.GameData;
-import service.gameClasses.*;
+import service.game.classes.*;
 
 
 public class GameService {

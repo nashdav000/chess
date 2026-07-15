@@ -6,8 +6,8 @@ import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.*;
-import service.userClasses.*;
-import service.gameClasses.*;
+import service.game.classes.*;
+import service.user.classes.*;
 
 import java.util.Map;
 
