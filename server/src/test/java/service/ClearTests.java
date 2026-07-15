@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.*;
 import org.junit.jupiter.api.*;
+import service.GameClasses.CreateRequest;
 import service.UserClasses.RegisterRequest;
 
 public class ClearTests {
@@ -40,8 +41,16 @@ public class ClearTests {
 
     @Test
     @DisplayName("Clear: Games")
-    public void clearGames(){
+    public void clearGames() throws Exception {
+        CreateRequest request = new CreateRequest(authToken, "game");
+        String testID = gameService.createGame(request).gameID();
+        Assertions.assertNotNull(testID);
 
+        GameData game = gameDAO.getGame(testID);
+        Assertions.assertNotNull(game);
+        gameService.clearGames();
+        game = gameDAO.getGame(testID);
+        Assertions.assertNull(game);
     }
 
     @Test
