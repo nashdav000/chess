@@ -2,8 +2,14 @@ package dataaccess;
 
 import model.UserData;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 public class MySQLUserDAO implements UserDAO {
 
+    public MySQLUserDAO throws DataAccessException() {
+        configureDatabase();
+    }
 
     public void createUser(UserData user){
 
@@ -29,4 +35,18 @@ public class MySQLUserDAO implements UserDAO {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
+
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : createUserStatements) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(DataAccessException.Type.SQL,
+                    String.format("Unable to configure database: %s", ex.getMessage()));
+        }
+    }
 }
