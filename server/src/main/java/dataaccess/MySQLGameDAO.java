@@ -30,4 +30,18 @@ public class MySQLGameDAO implements GameDAO {
     public void clearGames() {
 
     }
+
+    private final String[] createGameStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS  games (
+              `id` int NOT NULL,
+              `whiteUsername` varchar(256) DEFAULT NULL,
+              `blackUsername` varchar(256) DEFAULT NULL,
+              'gameName' varchar(256) NOT NULL,
+              'chessGame' TEXT NOT NULL
+              PRIMARY KEY (`id`),
+              INDEX(id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
 }
