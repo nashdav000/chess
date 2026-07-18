@@ -1,5 +1,7 @@
 package dataaccess;
 
+import static dataaccess.DataAccessException.Type.SQL;
+
 /**
  * Indicates there was an error connecting to the database
  */
@@ -9,7 +11,8 @@ public class DataAccessException extends Exception{
         AlreadyTaken,
         Unauthorized,
         DoesNotExist,
-        BadRequest
+        BadRequest,
+        SQL
     }
 
     private final Type type;
@@ -19,12 +22,15 @@ public class DataAccessException extends Exception{
         this.type = type;
     }
 
+    public DataAccessException(String message, Exception ex){this.type = SQL;}
+
     public int toHTTPResponse(){
         return switch (type){
             case BadRequest -> 400;
             case Unauthorized -> 401;
             case AlreadyTaken -> 403;
             case DoesNotExist -> 500;
+            case SQL -> 500;
         };
     }
 }
