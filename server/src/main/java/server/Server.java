@@ -13,22 +13,21 @@ import java.util.Map;
 
 public class Server {
 
-    // private final boolean memory = true;
-    // once database is implemented update all the calls to be tertiary determinants on which to use
-
     private final Javalin javalin;
-    private final static AuthDAO AUTH_DAO = new MemoryAuthDAO();
-    private final static UserDAO USER_DAO = new MemoryUserDAO();
-    private final static GameDAO GAME_DAO = new MemoryGameDAO();
+    private final UserService USER_SERVICE;
+    private final GameService GAME_SERVICE;
 
-    private final static UserService USER_SERVICE = new UserService(USER_DAO, AUTH_DAO);
-    private final static GameService GAME_SERVICE = new GameService(GAME_DAO, AUTH_DAO);
+    public Server(){
+        this(new GameService(new MemoryGameDAO(), new MemoryAuthDAO()),
+                new UserService(new MemoryUserDAO(), new MemoryAuthDAO()));
 
-    public Server() {
+    }
+
+    public Server(GameService gameService, UserService userService) {
+        this.USER_SERVICE = userService;
+        this.GAME_SERVICE = gameService;
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-
-        // Register your endpoints and exception handlers here.
 
         // User Endpoints
         javalin.post("/user", this::register);

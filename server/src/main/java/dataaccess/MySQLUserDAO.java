@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class MySQLUserDAO implements UserDAO {
 
-    public MySQLUserDAO throws DataAccessException() {
+    public MySQLUserDAO() throws DataAccessException {
         configureDatabase();
     }
 
