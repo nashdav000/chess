@@ -1,7 +1,12 @@
 package dataaccess;
 
+import com.google.gson.Gson;
+import model.UserData;
+
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class MySQLAuthDAO implements AuthDAO {
 
@@ -10,19 +15,49 @@ public class MySQLAuthDAO implements AuthDAO {
     }
 
     public String createAuth(String username) {
-        return "";
+        String authToken = UUID.randomUUID().toString();
+        var statement = "INSERT INTO authTokens VALUES ('%s', '%s')".formatted(authToken, username);
+        executeStatement(statement);
+        return authToken;
     }
 
     public String getAuth(String authToken) {
-        return "";
+        var statement = "SELECT * FROM authTokens WHERE authToken = '%s';".formatted(authToken);
+
+        try (Connection conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()){
+                return rs.getString("username");
+            }
+
+            return null;
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void deleteAuth(String authToken) {
-
+        var statement = "DELETE FROM authTokens WHERE authToken = '%s';".formatted(authToken);
+        executeStatement(statement);
     }
 
     public void clearAuth() {
+        var statement = "DELETE FROM authTokens";
+        executeStatement(statement);
+    }
 
+    private void executeStatement(String statement) {
+        try (Connection conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        }
+        catch(Exception e){
+//            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+        }
     }
 
     private final String[] createAuthStatements = {
@@ -30,7 +65,6 @@ public class MySQLAuthDAO implements AuthDAO {
             CREATE TABLE IF NOT EXISTS authTokens (
               `authToken` varchar(256) NOT NULL,
               `username` varchar(256) NOT NULL,
-              `json` TEXT NOT NULL,
               PRIMARY KEY (`authToken`),
               INDEX(authToken),
               INDEX(username)
