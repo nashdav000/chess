@@ -42,7 +42,7 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     public void clearUsers() {
-        var statement = "DROP user";
+        var statement = "DELETE FROM user";
         executeStatement(statement);
     }
 
