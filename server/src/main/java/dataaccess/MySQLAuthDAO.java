@@ -30,6 +30,7 @@ public class MySQLAuthDAO implements AuthDAO {
             CREATE TABLE IF NOT EXISTS authTokens (
               `authToken` varchar(256) NOT NULL,
               `username` varchar(256) NOT NULL,
+              `json` TEXT NOT NULL,
               PRIMARY KEY (`authToken`),
               INDEX(authToken),
               INDEX(username)

@@ -1,8 +1,10 @@
 package dataaccess;
 
+import com.google.gson.Gson;
 import model.UserData;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLUserDAO implements UserDAO {
@@ -11,17 +13,47 @@ public class MySQLUserDAO implements UserDAO {
         configureDatabase();
     }
 
-    public void createUser(UserData user){
+    public void createUser(UserData user) {
+        var json = new Gson().toJson(user);
+        var statement = "INSERT INTO user VALUES ('%s', '%s', '%s', '%s');"
+                .formatted(user.username(), user.password(), user.email(), json);
 
+        executeStatement(statement);
     }
 
     public UserData getUser(String username){
+        var statement = "SELECT * FROM user WHERE username='%s';".formatted(username);
 
+        try (Connection conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()){
+                var json = rs.getString("json");
+                return new Gson().fromJson(json, UserData.class);
+            }
+
+            return null;
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
         return null;
     }
 
     public void clearUsers() {
+        var statement = "DROP user";
+        executeStatement(statement);
+    }
 
+    private void executeStatement(String statement) {
+        try (Connection conn = DatabaseManager.getConnection();
+            var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        }
+        catch(Exception e){
+//            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+        }
     }
 
     private final String[] createUserStatements = {
@@ -30,6 +62,7 @@ public class MySQLUserDAO implements UserDAO {
               `username` varchar(256) NOT NULL,
               `password` varchar(256) NOT NULL,
               `email` varchar(256) NOT NULL,
+              `json` varchar(256) NOT NULL,
               PRIMARY KEY (`username`),
               INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
