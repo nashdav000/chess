@@ -9,6 +9,7 @@ import service.*;
 import service.game.classes.*;
 import service.user.classes.*;
 
+import javax.xml.crypto.Data;
 import java.util.Map;
 
 public class Server {
@@ -117,7 +118,7 @@ public class Server {
         ctx.json(json);
     }
 
-    private void clear(Context ctx){
+    private void clear(Context ctx) throws DataAccessException {
        USER_SERVICE.clearUsers();
        USER_SERVICE.clearAuths();
        GAME_SERVICE.clearGames();

@@ -3,6 +3,7 @@ package dataaccess;
 import com.google.gson.Gson;
 import model.UserData;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +14,7 @@ public class MySQLUserDAO implements UserDAO {
         configureDatabase();
     }
 
-    public void createUser(UserData user) {
+    public void createUser(UserData user) throws DataAccessException {
         var json = new Gson().toJson(user);
         var statement = "INSERT INTO user VALUES ('%s', '%s', '%s', '%s');"
                 .formatted(user.username(), user.password(), user.email(), json);
@@ -21,7 +22,7 @@ public class MySQLUserDAO implements UserDAO {
         executeStatement(statement);
     }
 
-    public UserData getUser(String username){
+    public UserData getUser(String username) throws DataAccessException {
         var statement = "SELECT * FROM user WHERE username='%s';".formatted(username);
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -36,23 +37,22 @@ public class MySQLUserDAO implements UserDAO {
             return null;
         }
         catch(Exception e){
-            e.printStackTrace();
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
         }
-        return null;
     }
 
-    public void clearUsers() {
+    public void clearUsers() throws DataAccessException {
         var statement = "DELETE FROM user";
         executeStatement(statement);
     }
 
-    private void executeStatement(String statement) {
+    private void executeStatement(String statement) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection();
             var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
         }
         catch(Exception e){
-//            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
         }
     }
 

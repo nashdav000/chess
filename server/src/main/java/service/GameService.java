@@ -28,7 +28,7 @@ public class GameService {
         return new CreateResult(gameAccess.createGame(request.gameName()));
     }
 
-    public void clearGames(){
+    public void clearGames() throws DataAccessException {
         gameAccess.clearGames();
     }
 

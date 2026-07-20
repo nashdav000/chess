@@ -1,8 +1,5 @@
 package dataaccess;
 
-import com.google.gson.Gson;
-import model.UserData;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,14 +11,14 @@ public class MySQLAuthDAO implements AuthDAO {
         configureDatabase();
     }
 
-    public String createAuth(String username) {
+    public String createAuth(String username) throws DataAccessException {
         String authToken = UUID.randomUUID().toString();
         var statement = "INSERT INTO authTokens VALUES ('%s', '%s');".formatted(authToken, username);
         executeStatement(statement);
         return authToken;
     }
 
-    public String getAuth(String authToken) {
+    public String getAuth(String authToken) throws DataAccessException {
         var statement = "SELECT * FROM authTokens WHERE authToken = '%s';".formatted(authToken);
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -29,35 +26,33 @@ public class MySQLAuthDAO implements AuthDAO {
             ResultSet rs = preparedStatement.executeQuery();
 
             if (rs.next()){
-                String username = rs.getString("username");
-                return username;
+                return rs.getString("username");
             }
 
             return null;
         }
         catch(Exception e){
-            e.printStackTrace();
+            throw new DataAccessException(DataAccessException.Type.SQL, "Error: Database");
         }
-        return null;
     }
 
-    public void deleteAuth(String authToken) {
+    public void deleteAuth(String authToken) throws DataAccessException {
         var statement = "DELETE FROM authTokens WHERE authToken = '%s';".formatted(authToken);
         executeStatement(statement);
     }
 
-    public void clearAuth() {
+    public void clearAuth() throws DataAccessException {
         var statement = "DELETE FROM authTokens";
         executeStatement(statement);
     }
 
-    private void executeStatement(String statement) {
+    private void executeStatement(String statement) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection();
              var preparedStatement = conn.prepareStatement(statement)) {
             preparedStatement.executeUpdate();
         }
         catch(Exception e){
-//            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
         }
     }
 

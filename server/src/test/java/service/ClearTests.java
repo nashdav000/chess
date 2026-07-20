@@ -32,11 +32,14 @@ public class ClearTests {
     @Test
     @DisplayName("Clear: Users")
     public void clearUsers(){
-        UserData test = USER_DAO.getUser(username);
-        Assertions.assertNotNull(test);
-        USER_SERVICE.clearUsers();
-        test = USER_DAO.getUser(username);
-        Assertions.assertNull(test);
+        Assertions.assertDoesNotThrow(() -> {
+            UserData test = USER_DAO.getUser(username);
+            Assertions.assertNotNull(test);
+            USER_SERVICE.clearUsers();
+            test = USER_DAO.getUser(username);
+            Assertions.assertNull(test);
+        });
+
     }
 
     @Test
@@ -56,10 +59,13 @@ public class ClearTests {
     @Test
     @DisplayName("Clear: Auth")
     public void clearAuths(){
-        String test = AUTH_DAO.getAuth(authToken);
-        Assertions.assertNotNull(test);
-        USER_SERVICE.clearAuths();
-        test = AUTH_DAO.getAuth(authToken);
-        Assertions.assertNull(test);
+        Assertions.assertDoesNotThrow(() -> {
+            String test = AUTH_DAO.getAuth(authToken);
+            Assertions.assertNotNull(test);
+            USER_SERVICE.clearAuths();
+            test = AUTH_DAO.getAuth(authToken);
+            Assertions.assertNull(test);
+        });
+
     }
 }

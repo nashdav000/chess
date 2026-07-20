@@ -42,11 +42,11 @@ public class UserService {
         return new RegisterResult(user.username(), authToken);
     }
 
-    public void clearUsers(){
+    public void clearUsers() throws DataAccessException {
         userAccess.clearUsers();
     }
 
-    public void clearAuths() {authAccess.clearAuth();}
+    public void clearAuths() throws DataAccessException {authAccess.clearAuth();}
 
     public LoginResult login(LoginRequest request) throws DataAccessException {
         // One or more fields are null
