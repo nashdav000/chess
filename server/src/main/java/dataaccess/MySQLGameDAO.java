@@ -1,11 +1,14 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.GameData;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MySQLGameDAO implements GameDAO {
 
@@ -13,30 +16,92 @@ public class MySQLGameDAO implements GameDAO {
         configureDatabase();
     }
 
-    public String createGame(String gameName) {
-        return "";
+    public String createGame(String gameName) throws DataAccessException {
+        ChessGame game = new ChessGame();
+        String json = new Gson().toJson(game);
+        var statement = "INSERT INTO games VALUES ('null', 'null', '%s', '%s');".
+                formatted(gameName, json);
+        executeStatement(statement);
+
+        // Get the ID
+        try (Connection conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()){
+                json = rs.getString("json");
+            }
+            return new Gson().fromJson(json, GameData.class).gameID();
+        }
+        catch(Exception e){
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+        }
     }
 
-    public Collection<GameData> listGames() {
-        return List.of();
+    public Collection<GameData> listGames() throws DataAccessException {
+        var statement = "SELECT * FROM games;";
+        Collection<GameData> games = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()){
+                var json = rs.getString("json");
+                games.add(new Gson().fromJson(json, GameData.class));
+            }
+
+            return games;
+        }
+        catch(Exception e){
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+        }
     }
 
-    public GameData getGame(String gameID) {
-        return null;
+    public GameData getGame(String gameID) throws DataAccessException {
+        var statement = "SELECT * FROM games WHERE id=%d;".formatted(Integer.parseInt(gameID));
+
+        try (Connection conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()){
+                var json = rs.getString("json");
+                return new Gson().fromJson(json, GameData.class);
+            }
+
+            return null;
+        }
+        catch(Exception e){
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+        }
     }
 
     public void setGame(String gameID, GameData game) {
-
+        String json = new Gson().toJson(game);
+        var statement = "UPDATE games SET chessGame = '%s', json = '%s' WHERE id = %d;"
+                .formatted(game, json, Integer.parseInt(gameID));
     }
 
-    public void clearGames() {
+    public void clearGames() throws DataAccessException {
+        var statement = "DELETE FROM games;";
+        executeStatement(statement);
+    }
 
+    private void executeStatement(String statement) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection();
+             var preparedStatement = conn.prepareStatement(statement)) {
+            preparedStatement.executeUpdate();
+        }
+        catch(Exception e){
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+        }
     }
 
     private final String[] createGameStatements = {
             """
             CREATE TABLE IF NOT EXISTS games (
-              `id` int NOT NULL,
+              `id` int AUTO_INCREMENT,
               `whiteUsername` varchar(256) DEFAULT NULL,
               `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,

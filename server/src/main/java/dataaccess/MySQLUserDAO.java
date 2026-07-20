@@ -2,8 +2,8 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +16,7 @@ public class MySQLUserDAO implements UserDAO {
 
     public void createUser(UserData user) throws DataAccessException {
         var json = new Gson().toJson(user);
+        // String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO user VALUES ('%s', '%s', '%s', '%s');"
                 .formatted(user.username(), user.password(), user.email(), json);
 
@@ -42,7 +43,7 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     public void clearUsers() throws DataAccessException {
-        var statement = "DELETE FROM user";
+        var statement = "DELETE FROM user;";
         executeStatement(statement);
     }
 
@@ -55,6 +56,7 @@ public class MySQLUserDAO implements UserDAO {
             throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
         }
     }
+
 
     private final String[] createUserStatements = {
             """
