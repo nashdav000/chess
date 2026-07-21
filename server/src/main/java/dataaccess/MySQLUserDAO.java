@@ -17,7 +17,6 @@ public class MySQLUserDAO implements UserDAO {
 
     public void createUser(UserData user) throws DataAccessException {
         String json = new Gson().toJson(user);
-        // String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?);";
         executeStatement(statement, user.username(), user.password(), user.email(), json);
     }

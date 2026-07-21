@@ -4,6 +4,7 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.UserData;
+import org.junit.jupiter.api.Assertions;
 import org.mindrot.jbcrypt.BCrypt;
 import service.user.classes.*;
 
@@ -32,9 +33,12 @@ public class UserService {
             throw new DataAccessException(DataAccessException.Type.AlreadyTaken, "Error: Username taken");
         }
 
+        // Hash the Password
+        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+
         // Create the user
         UserData user = new UserData(request.username(),
-                request.password(),
+                hashedPassword,
                 request.email());
         userAccess.createUser(user);
 
@@ -63,7 +67,7 @@ public class UserService {
         }
 
         // Password doesn't match
-        if (!Objects.equals(userAccess.getUser(request.username()).password(), request.password())){
+        if (!BCrypt.checkpw(request.password(), userAccess.getUser(request.username()).password())){
             throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
 
