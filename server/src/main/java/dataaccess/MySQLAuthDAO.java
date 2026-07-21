@@ -48,7 +48,7 @@ public class MySQLAuthDAO implements AuthDAO {
     }
 
     public void clearAuth() throws DataAccessException {
-        var statement = "DELETE FROM authTokens;";
+        var statement = "TRUNCATE TABLE authTokens;";
         executeStatement(statement);
     }
 

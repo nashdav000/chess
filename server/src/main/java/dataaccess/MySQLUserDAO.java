@@ -44,7 +44,7 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     public void clearUsers() throws DataAccessException {
-        var statement = "DELETE FROM users;";
+        var statement = "TRUNCATE TABLE users;";
         executeStatement(statement);
     }
 

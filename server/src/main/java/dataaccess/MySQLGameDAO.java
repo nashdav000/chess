@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static java.sql.Types.NULL;
+
 public class MySQLGameDAO implements GameDAO {
 
     public MySQLGameDAO() throws DataAccessException {
@@ -18,7 +20,7 @@ public class MySQLGameDAO implements GameDAO {
 
     public String createGame(String gameName) throws DataAccessException {
 
-        int gameID = 1;
+        int gameID;
 
         // Find the id of the last game
         String statement = "SELECT MAX(id) AS id FROM games;";
@@ -27,11 +29,7 @@ public class MySQLGameDAO implements GameDAO {
             ResultSet rs = preparedStatement.executeQuery();
             rs.next();
 
-            try{
-                gameID = rs.getInt("id") + 1;
-            }
-            catch(Exception e){}
-
+            gameID = rs.getInt("id") + 1;
         }
         catch(Exception e){
             throw new DataAccessException(DataAccessException.Type.SQL, "Unable to find ID");
@@ -41,9 +39,8 @@ public class MySQLGameDAO implements GameDAO {
         GameData gameData = new GameData(String.valueOf(gameID),null, null, gameName, game);
         String json = new Gson().toJson(gameData);
 
-        statement = "INSERT INTO games (gameName, json) VALUES ('%s', '%s');".
-                formatted(gameName, json);
-        executeStatement(statement);
+        statement = "INSERT INTO games (gameName, json) VALUES (?, ?);";
+        executeStatement(statement, gameName, json);
 
         return String.valueOf(gameID);
     }
@@ -69,17 +66,19 @@ public class MySQLGameDAO implements GameDAO {
     }
 
     public GameData getGame(String gameID) throws DataAccessException {
-        var statement = "SELECT * FROM games WHERE id=%d;".formatted(Integer.parseInt(gameID));
+        var statement = "SELECT * FROM games WHERE id = ?;";
 
         try (Connection conn = DatabaseManager.getConnection();
              var preparedStatement = conn.prepareStatement(statement)) {
+
+            preparedStatement.setInt(1, Integer.parseInt(gameID));
             ResultSet rs = preparedStatement.executeQuery();
 
-            rs.next();
-            var json = rs.getString("json");
-            if (json != null) {
+            if (rs.next()){
+                var json = rs.getString("json");
                 return new Gson().fromJson(json, GameData.class);
             }
+
             return null;
         }
         catch(Exception e){
@@ -89,24 +88,32 @@ public class MySQLGameDAO implements GameDAO {
 
     public void setGame(String gameID, GameData game) throws DataAccessException {
         String json = new Gson().toJson(game);
-        var statement = "UPDATE games SET json = '%s' WHERE id = %d;"
-                .formatted(json, Integer.parseInt(gameID));
-        executeStatement(statement);
+        var statement = "UPDATE games SET json = ? WHERE id = ?;";
+        executeStatement(statement, json, Integer.parseInt(gameID));
     }
 
     public void clearGames() throws DataAccessException {
-        var statement = "DELETE FROM games;";
+        var statement = "TRUNCATE TABLE games;";
         executeStatement(statement);
     }
 
-    private void executeStatement(String statement) throws DataAccessException {
+    private void executeStatement(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection();
-             var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
+             var ps = conn.prepareStatement(statement)) {
+
+            for (int i = 0; i < params.length; i++){
+                Object param = params[i];
+
+                if (param instanceof String p) ps.setString(i + 1, p);
+                else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                else ps.setNull(i + 1, NULL);
+            }
+
+            ps.executeUpdate();
         }
         catch(Exception e){
             throw new DataAccessException(DataAccessException.Type.SQL,
-                    "Unable to execute statement %s".formatted(statement));
+                    "Error: Unable to execute statement %s".formatted(statement));
         }
     }
 
@@ -114,8 +121,6 @@ public class MySQLGameDAO implements GameDAO {
             """
             CREATE TABLE IF NOT EXISTS games (
               `id` int AUTO_INCREMENT,
-              `whiteUsername` varchar(256) DEFAULT NULL,
-              `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,
               `json` TEXT NOT NULL,
               PRIMARY KEY (`id`),
