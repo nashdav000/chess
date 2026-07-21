@@ -34,32 +34,42 @@ public class AuthDAOTests {
 
     @Test
     @DisplayName("Get Auth: Success")
-    public void getAuthSuccess(){
-
+    public void getAuthSuccess() throws Exception {
+        String authToken = authDAO.createAuth("joe");
+        Assertions.assertNotNull(authToken);
+        Assertions.assertEquals("joe", authDAO.getAuth(authToken));
     }
 
     @Test
     @DisplayName("Get Auth: Fail")
-    public void getAuthFail(){
-
+    public void getAuthFail() throws Exception {
+        authDAO.createAuth("joe");
+        Assertions.assertNull(authDAO.getAuth(null));
     }
 
     @Test
     @DisplayName("Delete Auth: Success")
-    public void deleteAuthSuccess(){
-
+    public void deleteAuthSuccess() throws Exception {
+        String authToken = authDAO.createAuth("joe");
+        Assertions.assertNotNull(authToken);
+        authDAO.deleteAuth(authToken);
+        Assertions.assertNull(authDAO.getAuth(authToken));
     }
 
     @Test
     @DisplayName("Delete Auth: Fail")
-    public void deleteAuthFail(){
-
+    public void deleteAuthFail() throws Exception {
+        String authToken = authDAO.createAuth("joe");
+        authDAO.deleteAuth("joe");
+        Assertions.assertNotNull(authDAO.getAuth(authToken));
     }
 
     @Test
     @DisplayName("Clear Auth: Success")
-    public void clearAuthSuccess(){
-
+    public void clearAuthSuccess() throws Exception {
+        String authToken = authDAO.createAuth("joe");
+        authDAO.clearAuth();
+        Assertions.assertNull(authDAO.getAuth(authToken));
     }
 
 
