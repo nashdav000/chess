@@ -1,7 +1,5 @@
 package dataaccess;
 
-import javax.xml.crypto.Data;
-
 public interface AuthDAO {
 
     String createAuth(String username) throws DataAccessException;

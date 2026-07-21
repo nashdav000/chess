@@ -8,10 +8,8 @@ import service.UserService;
 public class ServerMain {
     public static void main(String[] args) {
         try{
-        GameService gameService = new GameService(new MySQLGameDAO(), new MySQLAuthDAO());
-        UserService userService = new UserService(new MySQLUserDAO(), new MySQLAuthDAO());
 
-        var server = new Server(gameService, userService).run(8080);
+        var server = new Server().run(8080);
 
         System.out.println("♕ 240 Chess Server");
         }

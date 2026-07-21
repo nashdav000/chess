@@ -14,6 +14,7 @@ public class MySQLAuthDAO implements AuthDAO {
     public String createAuth(String username) throws DataAccessException {
         String authToken = UUID.randomUUID().toString();
         var statement = "INSERT INTO authTokens VALUES ('%s', '%s');".formatted(authToken, username);
+        // var statement = "INSERT INTO authTokens (authToken, username) VALUES (?, ?);";
         executeStatement(statement);
         return authToken;
     }
@@ -32,7 +33,7 @@ public class MySQLAuthDAO implements AuthDAO {
             return null;
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Error: Database");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Error: Could not get authToken");
         }
     }
 

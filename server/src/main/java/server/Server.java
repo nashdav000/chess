@@ -9,7 +9,6 @@ import service.*;
 import service.game.classes.*;
 import service.user.classes.*;
 
-import javax.xml.crypto.Data;
 import java.util.Map;
 
 public class Server {
@@ -18,15 +17,24 @@ public class Server {
     private final UserService USER_SERVICE;
     private final GameService GAME_SERVICE;
 
-    public Server(){
-        this(new GameService(new MemoryGameDAO(), new MemoryAuthDAO()),
-                new UserService(new MemoryUserDAO(), new MemoryAuthDAO()));
+    public Server() {
+        GameDAO gameDAO;
+        AuthDAO authDAO;
+        UserDAO userDAO;
 
-    }
+        try{
+            gameDAO = new MySQLGameDAO();
+            authDAO = new MySQLAuthDAO();
+            userDAO = new MySQLUserDAO();
+        }
+        catch(Exception e){
+            gameDAO = new MemoryGameDAO();
+            authDAO = new MemoryAuthDAO();
+            userDAO = new MemoryUserDAO();
+        }
 
-    public Server(GameService gameService, UserService userService) {
-        this.USER_SERVICE = userService;
-        this.GAME_SERVICE = gameService;
+        this.USER_SERVICE = new UserService(userDAO, authDAO);
+        this.GAME_SERVICE = new GameService(gameDAO, authDAO);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
