@@ -19,19 +19,17 @@ public class MySQLGameDAO implements GameDAO {
     public String createGame(String gameName) throws DataAccessException {
         ChessGame game = new ChessGame();
         String json = new Gson().toJson(game);
-        var statement = "INSERT INTO games VALUES ('null', 'null', '%s', '%s');".
+        var statement = "INSERT INTO games (gameName, chessGame) VALUES ('%s', '%s');".
                 formatted(gameName, json);
         executeStatement(statement);
 
         // Get the ID
+        statement = "SELECT MAX(id) AS id FROM games;";
         try (Connection conn = DatabaseManager.getConnection();
              var preparedStatement = conn.prepareStatement(statement)) {
             ResultSet rs = preparedStatement.executeQuery();
-
-            while (rs.next()){
-                json = rs.getString("json");
-            }
-            return new Gson().fromJson(json, GameData.class).gameID();
+            rs.next();
+            return rs.getString("id");
         }
         catch(Exception e){
             throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
@@ -77,10 +75,11 @@ public class MySQLGameDAO implements GameDAO {
         }
     }
 
-    public void setGame(String gameID, GameData game) {
+    public void setGame(String gameID, GameData game) throws DataAccessException {
         String json = new Gson().toJson(game);
         var statement = "UPDATE games SET chessGame = '%s', json = '%s' WHERE id = %d;"
                 .formatted(game, json, Integer.parseInt(gameID));
+        executeStatement(statement);
     }
 
     public void clearGames() throws DataAccessException {
@@ -106,7 +105,6 @@ public class MySQLGameDAO implements GameDAO {
               `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,
               `chessGame` TEXT NOT NULL,
-              `json` TEXT NOT NULL,
               PRIMARY KEY (`id`),
               INDEX(id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
