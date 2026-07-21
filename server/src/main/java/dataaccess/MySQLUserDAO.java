@@ -5,14 +5,26 @@ import model.UserData;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
-import static java.sql.Types.NULL;
+import static dataaccess.DatabaseManager.configureDatabase;
+import static dataaccess.DatabaseManager.executeStatement;
 
 public class MySQLUserDAO implements UserDAO {
 
     public MySQLUserDAO() throws DataAccessException {
-        configureDatabase();
+        String[] createUserStatements = {
+                """
+            CREATE TABLE IF NOT EXISTS users (
+              `username` varchar(256) NOT NULL,
+              `password` varchar(256) NOT NULL,
+              `email` varchar(256) NOT NULL,
+              `json` varchar(256) NOT NULL,
+              PRIMARY KEY (`username`),
+              INDEX(username)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+        };
+        configureDatabase(createUserStatements);
     }
 
     public void createUser(UserData user) throws DataAccessException {
@@ -47,48 +59,4 @@ public class MySQLUserDAO implements UserDAO {
         executeStatement(statement);
     }
 
-    private void executeStatement(String statement, Object... params) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection();
-            var ps = conn.prepareStatement(statement)) {
-
-            for (int i = 0; i < params.length; i++){
-                Object param = params[i];
-                ps.setString(i + 1, param.toString());
-            }
-
-            ps.executeUpdate();
-        }
-        catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL,
-                    "Error: Unable to execute statement %s".formatted(statement));
-        }
-    }
-
-
-    private final String[] createUserStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS users (
-              `username` varchar(256) NOT NULL,
-              `password` varchar(256) NOT NULL,
-              `email` varchar(256) NOT NULL,
-              `json` varchar(256) NOT NULL,
-              PRIMARY KEY (`username`),
-              INDEX(username)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
-    };
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createUserStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(DataAccessException.Type.SQL,
-                    String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }

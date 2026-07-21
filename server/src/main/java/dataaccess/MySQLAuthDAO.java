@@ -2,15 +2,27 @@ package dataaccess;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.UUID;
 
+import static dataaccess.DatabaseManager.configureDatabase;
+import static dataaccess.DatabaseManager.executeStatement;
 import static java.sql.Types.NULL;
 
 public class MySQLAuthDAO implements AuthDAO {
 
     public MySQLAuthDAO() throws DataAccessException {
-        configureDatabase();
+        String[] createAuthStatements = {
+                """
+            CREATE TABLE IF NOT EXISTS authTokens (
+              `authToken` varchar(256) NOT NULL,
+              `username` varchar(256) NOT NULL,
+              PRIMARY KEY (`authToken`),
+              INDEX(authToken),
+              INDEX(username)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+        };
+        configureDatabase(createAuthStatements);
     }
 
     public String createAuth(String username) throws DataAccessException {
@@ -52,46 +64,4 @@ public class MySQLAuthDAO implements AuthDAO {
         executeStatement(statement);
     }
 
-    private void executeStatement(String statement, Object... params) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement)) {
-
-            for (int i = 0; i < params.length; i++){
-                Object param = params[i];
-                ps.setString(i + 1, param.toString());
-            }
-
-            ps.executeUpdate();
-        }
-        catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL,
-                    "Unable to execute statement %s".formatted(statement));
-        }
-    }
-
-    private final String[] createAuthStatements = {
-            """
-            CREATE TABLE IF NOT EXISTS authTokens (
-              `authToken` varchar(256) NOT NULL,
-              `username` varchar(256) NOT NULL,
-              PRIMARY KEY (`authToken`),
-              INDEX(authToken),
-              INDEX(username)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
-    };
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createAuthStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(DataAccessException.Type.SQL,
-                    String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }
