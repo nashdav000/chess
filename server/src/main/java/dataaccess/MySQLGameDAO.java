@@ -18,7 +18,7 @@ public class MySQLGameDAO implements GameDAO {
 
     public String createGame(String gameName) throws DataAccessException {
 
-        String gameID;
+        int gameID = 1;
 
         // Find the id of the last game
         String statement = "SELECT MAX(id) AS id FROM games;";
@@ -28,26 +28,24 @@ public class MySQLGameDAO implements GameDAO {
             rs.next();
 
             try{
-                gameID = String.valueOf(Integer.parseInt(rs.getString("id") + 1));
+                gameID = rs.getInt("id") + 1;
             }
-            catch(Exception e){
-                gameID = "1";
-            }
+            catch(Exception e){}
 
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to find ID");
         }
 
         ChessGame game = new ChessGame();
-        GameData gameData = new GameData(gameID,null, null, gameName, game);
+        GameData gameData = new GameData(String.valueOf(gameID),null, null, gameName, game);
         String json = new Gson().toJson(gameData);
 
         statement = "INSERT INTO games (gameName, json) VALUES ('%s', '%s');".
                 formatted(gameName, json);
         executeStatement(statement);
 
-        return gameID;
+        return String.valueOf(gameID);
     }
 
     public Collection<GameData> listGames() throws DataAccessException {
@@ -66,7 +64,7 @@ public class MySQLGameDAO implements GameDAO {
             return games;
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to list games");
         }
     }
 
@@ -77,15 +75,15 @@ public class MySQLGameDAO implements GameDAO {
              var preparedStatement = conn.prepareStatement(statement)) {
             ResultSet rs = preparedStatement.executeQuery();
 
-            if (rs.next()){
-                var json = rs.getString("json");
+            rs.next();
+            var json = rs.getString("json");
+            if (json != null) {
                 return new Gson().fromJson(json, GameData.class);
             }
-
             return null;
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to get games");
         }
     }
 
@@ -107,7 +105,8 @@ public class MySQLGameDAO implements GameDAO {
             preparedStatement.executeUpdate();
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL,
+                    "Unable to execute statement %s".formatted(statement));
         }
     }
 

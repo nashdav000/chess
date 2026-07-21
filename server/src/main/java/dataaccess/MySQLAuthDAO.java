@@ -52,7 +52,8 @@ public class MySQLAuthDAO implements AuthDAO {
             preparedStatement.executeUpdate();
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL,
+                    "Unable to execute statement %s".formatted(statement));
         }
     }
 

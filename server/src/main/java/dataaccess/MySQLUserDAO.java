@@ -38,7 +38,7 @@ public class MySQLUserDAO implements UserDAO {
             return null;
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to get user");
         }
     }
 
@@ -53,7 +53,8 @@ public class MySQLUserDAO implements UserDAO {
             preparedStatement.executeUpdate();
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
+            throw new DataAccessException(DataAccessException.Type.SQL,
+                    "Unable to execute statement %s".formatted(statement));
         }
     }
 
