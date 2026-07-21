@@ -14,8 +14,8 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalin;
-    private final UserService USER_SERVICE;
-    private final GameService GAME_SERVICE;
+    private final UserService userService;
+    private final GameService gameService;
 
     public Server() {
         GameDAO gameDAO;
@@ -33,8 +33,8 @@ public class Server {
             userDAO = new MemoryUserDAO();
         }
 
-        this.USER_SERVICE = new UserService(userDAO, authDAO);
-        this.GAME_SERVICE = new GameService(gameDAO, authDAO);
+        this.userService = new UserService(userDAO, authDAO);
+        this.gameService = new GameService(gameDAO, authDAO);
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -66,7 +66,7 @@ public class Server {
 
     private void register(Context ctx) throws DataAccessException{
         RegisterRequest request = new Gson().fromJson(ctx.body(), RegisterRequest.class);
-        RegisterResult result = USER_SERVICE.register(request);
+        RegisterResult result = userService.register(request);
 
         String json = new Gson().toJson(result);
         ctx.json(json);
@@ -74,7 +74,7 @@ public class Server {
 
     private void login(Context ctx) throws DataAccessException{
         LoginRequest request = new Gson().fromJson(ctx.body(), LoginRequest.class);
-        LoginResult result = USER_SERVICE.login(request);
+        LoginResult result = userService.login(request);
 
         String json = new Gson().toJson(result);
         ctx.json(json);
@@ -87,7 +87,7 @@ public class Server {
             throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
         }
 
-        USER_SERVICE.logout(request);
+        userService.logout(request);
 
         ctx.json("");
     }
@@ -105,14 +105,14 @@ public class Server {
                     "Error: Bad Request");
         }
 
-        CreateResult result = GAME_SERVICE.createGame(request);
+        CreateResult result = gameService.createGame(request);
         String json = new Gson().toJson(result);
         ctx.json(json);
     }
 
     private void list(Context ctx) throws DataAccessException {
         ListRequest request = new ListRequest(ctx.header("authorization"));
-        ListResult result = GAME_SERVICE.listGames(request);
+        ListResult result = gameService.listGames(request);
         String json = new Gson().toJson(result);
         ctx.json(json);
     }
@@ -121,15 +121,15 @@ public class Server {
         record Info(String playerColor, String gameID){}
         Info body = new Gson().fromJson(ctx.body(), Info.class);
         JoinRequest request = new JoinRequest(ctx.header("authorization"), body.playerColor, body.gameID);
-        JoinResult result = GAME_SERVICE.joinGame(request);
+        JoinResult result = gameService.joinGame(request);
         String json = new Gson().toJson(result);
         ctx.json(json);
     }
 
     private void clear(Context ctx) throws DataAccessException {
-       USER_SERVICE.clearUsers();
-       USER_SERVICE.clearAuths();
-       GAME_SERVICE.clearGames();
+       userService.clearUsers();
+       userService.clearAuths();
+       gameService.clearGames();
     }
 
     private void exceptionHandler(DataAccessException ex, Context ctx){

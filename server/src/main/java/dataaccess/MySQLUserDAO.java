@@ -53,9 +53,7 @@ public class MySQLUserDAO implements UserDAO {
 
             for (int i = 0; i < params.length; i++){
                 Object param = params[i];
-
-                if (param instanceof String p){ps.setString(i + 1, p);}
-                else {ps.setNull(i + 1, NULL);}
+                ps.setString(i + 1, param.toString());
             }
 
             ps.executeUpdate();
