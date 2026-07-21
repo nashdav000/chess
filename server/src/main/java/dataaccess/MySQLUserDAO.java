@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static java.sql.Types.NULL;
+
 public class MySQLUserDAO implements UserDAO {
 
     public MySQLUserDAO() throws DataAccessException {
@@ -14,23 +16,23 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     public void createUser(UserData user) throws DataAccessException {
-        var json = new Gson().toJson(user);
+        String json = new Gson().toJson(user);
         // String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
-        var statement = "INSERT INTO user VALUES ('%s', '%s', '%s', '%s');"
-                .formatted(user.username(), user.password(), user.email(), json);
-
-        executeStatement(statement);
+        var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?);";
+        executeStatement(statement, user.username(), user.password(), user.email(), json);
     }
 
     public UserData getUser(String username) throws DataAccessException {
-        var statement = "SELECT * FROM user WHERE username='%s';".formatted(username);
+        var statement = "SELECT * FROM users WHERE username='%s';".formatted(username);
 
         try (Connection conn = DatabaseManager.getConnection();
              var preparedStatement = conn.prepareStatement(statement)) {
+
+
             ResultSet rs = preparedStatement.executeQuery();
 
             if (rs.next()){
-                var json = rs.getString("json");
+                String json = rs.getString("json");
                 return new Gson().fromJson(json, UserData.class);
             }
 
@@ -42,14 +44,22 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     public void clearUsers() throws DataAccessException {
-        var statement = "DELETE FROM user;";
+        var statement = "DELETE FROM users;";
         executeStatement(statement);
     }
 
-    private void executeStatement(String statement) throws DataAccessException {
+    private void executeStatement(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection();
-            var preparedStatement = conn.prepareStatement(statement)) {
-            preparedStatement.executeUpdate();
+            var ps = conn.prepareStatement(statement)) {
+
+            for (int i = 0; i < params.length; i++){
+                Object param = params[i];
+
+                if (param instanceof String p){ps.setString(i + 1, p);}
+                else {ps.setNull(i + 1, NULL);}
+            }
+
+            ps.executeUpdate();
         }
         catch(Exception e){
             throw new DataAccessException(DataAccessException.Type.SQL,
@@ -60,7 +70,7 @@ public class MySQLUserDAO implements UserDAO {
 
     private final String[] createUserStatements = {
             """
-            CREATE TABLE IF NOT EXISTS user (
+            CREATE TABLE IF NOT EXISTS users (
               `username` varchar(256) NOT NULL,
               `password` varchar(256) NOT NULL,
               `email` varchar(256) NOT NULL,
