@@ -89,8 +89,8 @@ public class MySQLGameDAO implements GameDAO {
 
     public void setGame(String gameID, GameData game) throws DataAccessException {
         String json = new Gson().toJson(game);
-        var statement = "UPDATE games SET chessGame = '%s', json = '%s' WHERE id = %d;"
-                .formatted(game, json, Integer.parseInt(gameID));
+        var statement = "UPDATE games SET json = '%s' WHERE id = %d;"
+                .formatted(json, Integer.parseInt(gameID));
         executeStatement(statement);
     }
 
