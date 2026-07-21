@@ -19,14 +19,14 @@ public class GameDAOTests {
 
     @Test
     @DisplayName("Create Game: Success")
-    public void createAuthSuccess() throws Exception {
+    public void createGameSuccess() throws Exception {
         String id = gameDAO.createGame("game");
         Assertions.assertEquals("game", gameDAO.getGame(id).gameName());
     }
 
     @Test
     @DisplayName("Create Game: Fail")
-    public void createAuthFail(){
+    public void createGameFail(){
         Assertions.assertThrows(DataAccessException.class, ()->{
            gameDAO.createGame(null);
         });
@@ -34,14 +34,17 @@ public class GameDAOTests {
 
     @Test
     @DisplayName("Get Game: Success")
-    public void getAuthSuccess(){
-
+    public void getGameSuccess() throws Exception {
+        String id = gameDAO.createGame("game");
+        Assertions.assertEquals("game", gameDAO.getGame(id).gameName());
     }
 
     @Test
     @DisplayName("Get Game: Fail")
-    public void getAuthFail(){
-
+    public void getGameFail(){
+        Assertions.assertDoesNotThrow(() -> {
+            Assertions.assertNull(gameDAO.getGame("5"));
+        });
     }
 
     @Test
@@ -70,8 +73,11 @@ public class GameDAOTests {
 
     @Test
     @DisplayName("Clear Game: Success")
-    public void clearGameSuccess(){
-
+    public void clearGameSuccess() throws Exception{
+        String id = gameDAO.createGame("game");
+        Assertions.assertNotNull(gameDAO.getGame(id));
+        gameDAO.clearGames();
+        Assertions.assertNull(gameDAO.getGame(id));
     }
 
 
