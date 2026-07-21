@@ -17,23 +17,37 @@ public class MySQLGameDAO implements GameDAO {
     }
 
     public String createGame(String gameName) throws DataAccessException {
-        ChessGame game = new ChessGame();
-        String json = new Gson().toJson(game);
-        var statement = "INSERT INTO games (gameName, chessGame) VALUES ('%s', '%s');".
-                formatted(gameName, json);
-        executeStatement(statement);
 
-        // Get the ID
-        statement = "SELECT MAX(id) AS id FROM games;";
+        String gameID;
+
+        // Find the id of the last game
+        String statement = "SELECT MAX(id) AS id FROM games;";
         try (Connection conn = DatabaseManager.getConnection();
              var preparedStatement = conn.prepareStatement(statement)) {
             ResultSet rs = preparedStatement.executeQuery();
             rs.next();
-            return rs.getString("id");
+
+            try{
+                gameID = String.valueOf(Integer.parseInt(rs.getString("id") + 1));
+            }
+            catch(Exception e){
+                gameID = "1";
+            }
+
         }
         catch(Exception e){
             throw new DataAccessException(DataAccessException.Type.SQL, "Unable to execute statement");
         }
+
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(gameID,null, null, gameName, game);
+        String json = new Gson().toJson(gameData);
+
+        statement = "INSERT INTO games (gameName, json) VALUES ('%s', '%s');".
+                formatted(gameName, json);
+        executeStatement(statement);
+
+        return gameID;
     }
 
     public Collection<GameData> listGames() throws DataAccessException {
@@ -104,7 +118,7 @@ public class MySQLGameDAO implements GameDAO {
               `whiteUsername` varchar(256) DEFAULT NULL,
               `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,
-              `chessGame` TEXT NOT NULL,
+              `json` TEXT NOT NULL,
               PRIMARY KEY (`id`),
               INDEX(id)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

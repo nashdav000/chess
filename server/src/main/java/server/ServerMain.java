@@ -16,6 +16,7 @@ public class ServerMain {
         System.out.println("♕ 240 Chess Server");
         }
         catch(Exception e){
+            e.printStackTrace();
             System.out.println("Error: Database Malfunction");}
         }
     }
