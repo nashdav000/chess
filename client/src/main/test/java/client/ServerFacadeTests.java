@@ -1,5 +1,6 @@
 package client;
 
+import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 
@@ -7,12 +8,20 @@ import server.Server;
 public class ServerFacadeTests {
 
     private static Server server;
+    private static ServerFacade facade;
+    private static UserData user;
 
     @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
+        user = new UserData("Joe", "password", "email");
+    }
+
+    @BeforeEach
+    public void clear(){
+        facade.clear();
     }
 
     @AfterAll
@@ -22,8 +31,16 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    @DisplayName("Register: Successful")
+    public void registerSuccessful() {
+        var result = facade.register(user);
+        Assertions.assert;
+    }
+
+    @Test
+    @DisplayName("Register: Preexisting User")
+    public void registerPreexisting(){
+
     }
 
 }
