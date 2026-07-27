@@ -8,14 +8,16 @@ import server.Server;
 public class ServerFacadeTests {
 
     private static Server server;
-    private static ServerFacade facade = new ServerFacade("http://localhost:8080");
+    private static ServerFacade facade;
     private static UserData user;
 
     @BeforeAll
     public static void init() {
         server = new Server();
         var port = server.run(0);
+        var url = "http://localhost:" + server.port();
         System.out.println("Started test HTTP server on " + port);
+        facade = new ServerFacade(url);
         user = new UserData("Joe", "password", "email");
     }
 

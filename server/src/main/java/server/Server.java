@@ -137,4 +137,6 @@ public class Server {
         ctx.status(ex.toHTTPResponse());
         ctx.json(json);
     }
+
+    public int port(){return javalin.port();}
 }
