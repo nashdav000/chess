@@ -19,49 +19,48 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
-    public UserData register(UserData user) throws ServerException {
+    public AuthData register(UserData user) throws ServerException {
         var request = buildRequest("POST", "/user", user);
         var response = sendRequest(request);
-
-
-
-        return null;
+        return handleResponse(response, AuthData.class);
     }
 
     public AuthData login(UserData user) throws ServerException {
         var request = buildRequest("POST", "/session", user);
         var response = sendRequest(request);
-
-        return null;
+        return handleResponse(response, AuthData.class);
     }
 
     public void logout() throws ServerException{
         var request = buildRequest("DELETE", "/session", null);
         var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
-    public GameData createGame(String name) throws ServerException{
+    public String createGame(String name) throws ServerException{
         var path = "/game/%s".formatted(name);
         var request = buildRequest("POST", path, null);
         var response = sendRequest(request);
-
-        return null;
+        return handleResponse(response, String.class);
     }
 
     public void listGames() throws ServerException{
         var request = buildRequest("GET", "/game", null);
         var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public void joinGame(String color, int id) throws ServerException{
         var path = "/game/%d".formatted(id);
         var request = buildRequest("PUT", path, null);
         var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public void clear() throws ServerException {
         var request = buildRequest("DELETE", "/db", null);
         var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
 
@@ -95,5 +94,17 @@ public class ServerFacade {
         catch (Exception e){
             throw new ServerException("Error: Bad Request");
         }
+    }
+
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ServerException {
+        if (response.statusCode() / 100 != 2){
+            throw new ServerException("Error: " + response.statusCode() + " status code");
+        }
+
+        if (response.body() != null){
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+
+        return null;
     }
 }

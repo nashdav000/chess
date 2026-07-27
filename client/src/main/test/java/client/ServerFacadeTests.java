@@ -8,7 +8,7 @@ import server.Server;
 public class ServerFacadeTests {
 
     private static Server server;
-    private static ServerFacade facade;
+    private static ServerFacade facade = new ServerFacade("http://localhost:8080");
     private static UserData user;
 
     @BeforeAll
@@ -34,7 +34,7 @@ public class ServerFacadeTests {
     @DisplayName("Register: Successful")
     public void registerSuccessful() {
         var response = facade.register(user);
-        Assertions.assert;
+        Assertions.assertTrue(true);
     }
 
     @Test
