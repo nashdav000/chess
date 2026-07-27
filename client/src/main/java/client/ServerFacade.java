@@ -25,32 +25,32 @@ public class ServerFacade {
         return handleResponse(response, AuthData.class);
     }
 
-    public AuthData login(UserData user) throws ServerException {
-        var request = buildRequest("POST", "/session", user);
+    public AuthData login(String username, String password) throws ServerException {
+        var request = buildRequest("POST", "/session", String.class);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
 
-    public void logout() throws ServerException{
+    public void logout(String authToken) throws ServerException{
         var request = buildRequest("DELETE", "/session", null);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
 
-    public String createGame(String name) throws ServerException{
+    public String createGame(String name, String authToken) throws ServerException{
         var path = "/game/%s".formatted(name);
         var request = buildRequest("POST", path, null);
         var response = sendRequest(request);
         return handleResponse(response, String.class);
     }
 
-    public void listGames() throws ServerException{
+    public void listGames(String authToken) throws ServerException{
         var request = buildRequest("GET", "/game", null);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
 
-    public void joinGame(String color, int id) throws ServerException{
+    public void joinGame(String color, int id, String authToken) throws ServerException{
         var path = "/game/%d".formatted(id);
         var request = buildRequest("PUT", path, null);
         var response = sendRequest(request);
