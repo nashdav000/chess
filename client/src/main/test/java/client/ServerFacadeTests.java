@@ -33,7 +33,7 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("Register: Successful")
     public void registerSuccessful() {
-        var result = facade.register(user);
+        var response = facade.register(user);
         Assertions.assert;
     }
 

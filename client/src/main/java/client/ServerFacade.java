@@ -1,7 +1,6 @@
 package client;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import model.*;
 
 import java.net.URI;
@@ -20,7 +19,7 @@ public class ServerFacade {
         this.serverUrl = url;
     }
 
-    public UserData register(UserData user) throws DataAccessException {
+    public UserData register(UserData user) throws ServerException {
         var request = buildRequest("POST", "/user", user);
         var response = sendRequest(request);
 
@@ -29,19 +28,19 @@ public class ServerFacade {
         return null;
     }
 
-    public AuthData login(UserData user) throws DataAccessException {
+    public AuthData login(UserData user) throws ServerException {
         var request = buildRequest("POST", "/session", user);
         var response = sendRequest(request);
 
         return null;
     }
 
-    public void logout() throws DataAccessException{
+    public void logout() throws ServerException{
         var request = buildRequest("DELETE", "/session", null);
         var response = sendRequest(request);
     }
 
-    public GameData createGame(String name) throws DataAccessException{
+    public GameData createGame(String name) throws ServerException{
         var path = "/game/%s".formatted(name);
         var request = buildRequest("POST", path, null);
         var response = sendRequest(request);
@@ -49,18 +48,18 @@ public class ServerFacade {
         return null;
     }
 
-    public void listGames() throws DataAccessException{
+    public void listGames() throws ServerException{
         var request = buildRequest("GET", "/game", null);
         var response = sendRequest(request);
     }
 
-    public void joinGame(String color, int id) throws DataAccessException{
+    public void joinGame(String color, int id) throws ServerException{
         var path = "/game/%d".formatted(id);
         var request = buildRequest("PUT", path, null);
         var response = sendRequest(request);
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws ServerException {
         var request = buildRequest("DELETE", "/db", null);
         var response = sendRequest(request);
     }
@@ -89,12 +88,12 @@ public class ServerFacade {
         }
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) throws DataAccessException {
+    private HttpResponse<String> sendRequest(HttpRequest request) throws ServerException {
         try{
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         }
         catch (Exception e){
-            throw new DataAccessException;
+            throw new ServerException("Error: Bad Request");
         }
     }
 }
