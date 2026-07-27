@@ -1,5 +1,6 @@
 package client;
 
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -35,14 +36,17 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("Register: Successful")
     public void registerSuccessful() {
-        var response = facade.register(user);
-        Assertions.assertTrue(true);
+        AuthData response = facade.register(user);
+        Assertions.assertNotNull(response);
+        Assertions.assertTrue(response.authToken().length() > 10);
+        Assertions.assertEquals(user.username(), response.username());
     }
 
     @Test
     @DisplayName("Register: Preexisting User")
     public void registerPreexisting(){
-
+        facade.register(user);
+        Assertions.assertThrows(ServerException.class, () -> facade.register(user));
     }
 
 }

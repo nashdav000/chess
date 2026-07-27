@@ -101,7 +101,7 @@ public class ServerFacade {
             throw new ServerException("Error: " + response.statusCode() + " status code");
         }
 
-        if (response.body() != null){
+        if (responseClass != null){
             return new Gson().fromJson(response.body(), responseClass);
         }
 
