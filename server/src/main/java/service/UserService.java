@@ -68,7 +68,7 @@ public class UserService {
 
         // Password doesn't match
         if (!BCrypt.checkpw(request.password(), userAccess.getUser(request.username()).password())){
-            throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Unauthorized");
+            throw new DataAccessException(DataAccessException.Type.Unauthorized, "Error: Password does not match");
         }
 
         return new LoginResult(request.username(),

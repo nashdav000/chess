@@ -4,6 +4,7 @@ import client.helperClasses.Status;
 import model.UserData;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
@@ -22,7 +23,7 @@ public class Repl {
         Scanner scanner = new Scanner(System.in);
         String result = "";
 
-        while (result != "quit"){
+        while (!result.equals("quit")){
             promptUser();
             String line = scanner.nextLine();
 

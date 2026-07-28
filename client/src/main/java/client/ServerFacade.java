@@ -99,18 +99,16 @@ public class ServerFacade {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         }
         catch (Exception e){
-            throw new ServerException("Error: Bad Request");
+            throw new ServerException("Error: Unable to connect to main server");
         }
     }
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ServerException {
         if (response.statusCode() / 100 != 2){
-            switch (response.statusCode()) {
-                case 400 -> throw new ServerException("Error: Bad Request. One more or fields left blank");
-                case 401 -> throw new ServerException("Error: Unauthorized");
-                case 403 -> throw new ServerException("Error: Username already taken");
-                case 500 -> throw new ServerException("Error: Does Not Exist");
-            }
+            record error(String message){}
+            var message = new Gson().fromJson(response.body(), error.class).message();
+
+            throw new ServerException(message);
         }
 
         if (responseClass != null){
