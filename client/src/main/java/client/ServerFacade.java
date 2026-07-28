@@ -9,6 +9,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,9 +54,10 @@ public class ServerFacade {
     }
 
     public List<GameData> listGames(String authToken) throws ServerException{
+        record listResult(List games){}
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
-        return handleResponse(response, null);
+        return handleResponse(response, listResult.class).games();
     }
 
     public void joinGame(String color, String id, String authToken) throws ServerException{
