@@ -4,7 +4,6 @@ import client.helperClasses.Status;
 import model.UserData;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
