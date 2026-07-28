@@ -21,7 +21,7 @@ public class ServerFacade {
     }
 
     public AuthData register(UserData user) throws ServerException {
-        var request = buildRequest("POST", "/user", user);
+        var request = buildRequest("POST", "/user", user, null);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
@@ -29,26 +29,26 @@ public class ServerFacade {
     public AuthData login(String username, String password) throws ServerException {
         record loginAttempt(String username, String password){}
 
-        var request = buildRequest("POST", "/session", new loginAttempt(username, password));
+        var request = buildRequest("POST", "/session", new loginAttempt(username, password), null);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
 
     public void logout(String authToken) throws ServerException{
-        var request = buildRequest("DELETE", "/session", null);
+        var request = buildRequest("DELETE", "/session", null, authToken);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
 
     public String createGame(String name, String authToken) throws ServerException{
         var path = "/game/%s".formatted(name);
-        var request = buildRequest("POST", path, null);
+        var request = buildRequest("POST", path, null, authToken);
         var response = sendRequest(request);
         return handleResponse(response, String.class);
     }
 
     public List<GameData> listGames(String authToken) throws ServerException{
-        var request = buildRequest("GET", "/game", null);
+        var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
         return handleResponse(response, null);
     }
@@ -56,13 +56,13 @@ public class ServerFacade {
     public void joinGame(String color, String id, String authToken) throws ServerException{
 
         var path = "/game/%s".formatted(id);
-        var request = buildRequest("PUT", path, color);
+        var request = buildRequest("PUT", path, color, authToken);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
 
     public void clear() throws ServerException {
-        var request = buildRequest("DELETE", "/db", null);
+        var request = buildRequest("DELETE", "/db", null, null);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
@@ -70,13 +70,17 @@ public class ServerFacade {
 
 
 
-    private HttpRequest buildRequest(String method, String path, Object body){
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken){
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
 
         if (body != null){
             request.setHeader("Content-Type", "application/json");
+        }
+
+        if (authToken != null){
+            request.setHeader("Authorization", authToken);
         }
 
         return request.build();
