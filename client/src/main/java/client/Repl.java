@@ -16,22 +16,22 @@ public class Repl {
     public Repl(String url) {facade = new ServerFacade(url);}
 
     public void run(){
-        System.out.println("Welcome to 240 Chess. Type 'help' to get started.");
+        System.out.print("Welcome to 240 Chess. Type 'help' to get started.");
 
 
         Scanner scanner = new Scanner(System.in);
         String result = "";
 
         while (result != "quit"){
-            userPrompt();
+            promptUser();
             String line = scanner.nextLine();
 
             try{
                 result = eval(line);
-                System.out.print(SET_TEXT_COLOR_BLUE + result);
+                System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
             }
             catch(Exception e){
-                System.out.print(SET_TEXT_COLOR_RED + "Error: " + e.toString());
+                System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR);
             }
         }
     }
@@ -48,7 +48,7 @@ public class Repl {
         };
     }
 
-    private void userPrompt(){System.out.println("\n" + ERASE_SCREEN + ">>> " + SET_TEXT_COLOR_GREEN);}
+    private void promptUser(){System.out.print("\n" + ERASE_SCREEN + ">>> " + SET_TEXT_COLOR_GREEN);}
 
     private String help(){
         return SET_TEXT_COLOR_YELLOW + "register <USERNAME> <PASSWORD> <EMAIL> " +
