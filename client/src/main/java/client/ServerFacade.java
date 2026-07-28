@@ -9,6 +9,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.util.List;
 
 public class ServerFacade {
 
@@ -26,7 +27,9 @@ public class ServerFacade {
     }
 
     public AuthData login(String username, String password) throws ServerException {
-        var request = buildRequest("POST", "/session", String.class);
+        record loginAttempt(String username, String password){}
+
+        var request = buildRequest("POST", "/session", new loginAttempt(username, password));
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
@@ -44,15 +47,16 @@ public class ServerFacade {
         return handleResponse(response, String.class);
     }
 
-    public void listGames(String authToken) throws ServerException{
+    public List<GameData> listGames(String authToken) throws ServerException{
         var request = buildRequest("GET", "/game", null);
         var response = sendRequest(request);
-        handleResponse(response, null);
+        return handleResponse(response, null);
     }
 
-    public void joinGame(String color, int id, String authToken) throws ServerException{
-        var path = "/game/%d".formatted(id);
-        var request = buildRequest("PUT", path, null);
+    public void joinGame(String color, String id, String authToken) throws ServerException{
+
+        var path = "/game/%s".formatted(id);
+        var request = buildRequest("PUT", path, color);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
