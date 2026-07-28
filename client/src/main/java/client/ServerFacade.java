@@ -102,7 +102,12 @@ public class ServerFacade {
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ServerException {
         if (response.statusCode() / 100 != 2){
-            throw new ServerException("Error: " + response.statusCode() + " status code");
+            switch (response.statusCode()) {
+                case 400 -> throw new ServerException("Error: Bad Request. One more or fields left blank");
+                case 401 -> throw new ServerException("Error: Unauthorized");
+                case 403 -> throw new ServerException("Error: Username already taken");
+                case 500 -> throw new ServerException("Error: Does Not Exist");
+            }
         }
 
         if (responseClass != null){
