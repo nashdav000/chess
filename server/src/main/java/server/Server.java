@@ -96,6 +96,7 @@ public class Server {
         // Temp class to read in json object
         record Info(String gameName){}
         Info body = new Gson().fromJson(ctx.body(), Info.class);
+
         String head = ctx.header("authorization");
         CreateRequest request = new CreateRequest(head, body.gameName);
 
