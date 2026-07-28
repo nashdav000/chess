@@ -147,6 +147,24 @@ public class ServerFacadeTests {
         facade.createGame("game", authToken);
         games = facade.listGames(authToken);
         Assertions.assertEquals(1, games.size());
+
+        facade.createGame("game", authToken);
+        games = facade.listGames(authToken);
+        Assertions.assertEquals(2, games.size());
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("List Games: Joined Game Displays Correct Information")
+    public void listGamesUpdated(){
+        String authToken = facade.register(user).authToken();
+        String id = facade.createGame("game", authToken);
+        facade.joinGame("WHITE", id, authToken);
+
+        List<GameData> games = facade.listGames(authToken);
+        Assertions.assertEquals(1, games.size());
+
+        Assertions.assertEquals(user.username(), games.getFirst().whiteUsername());
     }
 
     @Test

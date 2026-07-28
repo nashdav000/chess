@@ -54,7 +54,7 @@ public class ServerFacade {
     }
 
     public List<GameData> listGames(String authToken) throws ServerException{
-        record listResult(List games){}
+        record listResult(List<GameData> games){}
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
         return handleResponse(response, listResult.class).games();
@@ -62,7 +62,7 @@ public class ServerFacade {
 
     public void joinGame(String color, String id, String authToken) throws ServerException{
         var path = "/game";
-        record joinAttempt(String color, String id){}
+        record joinAttempt(String playerColor, String gameID){}
         var request = buildRequest("PUT", path, new joinAttempt(color, id), authToken);
         var response = sendRequest(request);
         handleResponse(response, null);
