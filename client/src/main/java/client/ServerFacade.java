@@ -1,5 +1,6 @@
 package client;
 
+import client.helperClasses.*;
 import com.google.gson.Gson;
 import model.*;
 
@@ -9,9 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ServerFacade {
 
@@ -29,9 +28,7 @@ public class ServerFacade {
     }
 
     public AuthData login(String username, String password) throws ServerException {
-        record loginAttempt(String username, String password){}
-
-        var request = buildRequest("POST", "/session", new loginAttempt(username, password), null);
+        var request = buildRequest("POST", "/session", new loginSend(username, password), null);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
@@ -43,9 +40,6 @@ public class ServerFacade {
     }
 
     public String createGame(String name, String authToken) throws ServerException{
-        record createSend(String gameName){}
-        record createReceive(String gameID){}
-
         var path = "/game";
         var request = buildRequest("POST", path, new createSend(name), authToken);
         var response = sendRequest(request);
@@ -54,16 +48,14 @@ public class ServerFacade {
     }
 
     public List<GameData> listGames(String authToken) throws ServerException{
-        record listResult(List<GameData> games){}
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
-        return handleResponse(response, listResult.class).games();
+        return handleResponse(response, listReceive.class).games();
     }
 
     public void joinGame(String color, String id, String authToken) throws ServerException{
         var path = "/game";
-        record joinAttempt(String playerColor, String gameID){}
-        var request = buildRequest("PUT", path, new joinAttempt(color, id), authToken);
+        var request = buildRequest("PUT", path, new joinSend(color, id), authToken);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
