@@ -1,6 +1,7 @@
 package client;
 
-import client.helperClasses.*;
+import client.helperclasses.*;
+import client.helperclasses.ErrorReceive;
 import com.google.gson.Gson;
 import model.*;
 
@@ -15,7 +16,7 @@ import java.util.List;
 public class ServerFacade {
 
     private final String serverUrl;
-    private static final HttpClient client = HttpClient.newHttpClient();
+    private static final HttpClient CLIENT = HttpClient.newHttpClient();
 
     public ServerFacade(String url){
         this.serverUrl = url;
@@ -28,7 +29,7 @@ public class ServerFacade {
     }
 
     public AuthData login(String username, String password) throws ServerException {
-        var request = buildRequest("POST", "/session", new loginSend(username, password), null);
+        var request = buildRequest("POST", "/session", new LoginSend(username, password), null);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
@@ -41,21 +42,21 @@ public class ServerFacade {
 
     public String createGame(String name, String authToken) throws ServerException{
         var path = "/game";
-        var request = buildRequest("POST", path, new createSend(name), authToken);
+        var request = buildRequest("POST", path, new CreateSend(name), authToken);
         var response = sendRequest(request);
 
-        return handleResponse(response, createReceive.class).gameID();
+        return handleResponse(response, CreateReceive.class).gameID();
     }
 
     public List<GameData> listGames(String authToken) throws ServerException{
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
-        return handleResponse(response, listReceive.class).games();
+        return handleResponse(response, ListReceive.class).games();
     }
 
     public void joinGame(String color, String id, String authToken) throws ServerException{
         var path = "/game";
-        var request = buildRequest("PUT", path, new joinSend(color, id), authToken);
+        var request = buildRequest("PUT", path, new JoinSend(color, id), authToken);
         var response = sendRequest(request);
         handleResponse(response, null);
     }
@@ -96,7 +97,7 @@ public class ServerFacade {
 
     private HttpResponse<String> sendRequest(HttpRequest request) throws ServerException {
         try{
-            return client.send(request, HttpResponse.BodyHandlers.ofString());
+            return CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         }
         catch (Exception e){
             throw new ServerException("Error: Unable to connect to main server");
@@ -105,8 +106,7 @@ public class ServerFacade {
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ServerException {
         if (response.statusCode() / 100 != 2){
-            record error(String message){}
-            var message = new Gson().fromJson(response.body(), error.class).message();
+            var message = new Gson().fromJson(response.body(), ErrorReceive.class).message();
 
             throw new ServerException(message);
         }
