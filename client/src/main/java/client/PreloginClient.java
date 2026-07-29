@@ -1,8 +1,6 @@
 package client;
 
-import client.helperClasses.Status;
 import model.UserData;
-
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -13,11 +11,10 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
 import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
 
 public class PreloginClient {
-    private Status status = Status.SIGNEDOUT;
     private final ServerFacade facade;
+    private final String url;
 
-
-    public PreloginClient(String url) {facade = new ServerFacade(url);}
+    public PreloginClient(String url) {this.url = url; facade = new ServerFacade(url);}
 
     public void run(){
         System.out.print("Welcome to 240 Chess. Type 'help' to get started.");
@@ -33,6 +30,8 @@ public class PreloginClient {
             try{
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
+
+                if (result.equals("login") || result.equals("register")){switchToLoggedIn();}
             }
             catch(Exception e){
                 System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR);
@@ -70,7 +69,6 @@ public class PreloginClient {
             String username = params[0];
             String password = params[1];
             facade.login(username, password);
-            status = Status.SIGNEDIN;
             return "Logged in as %s".formatted(username);
         }
         else{
@@ -85,11 +83,14 @@ public class PreloginClient {
             String password = params[1];
             String email = params[2];
             facade.register(new UserData(username, password, email));
-            status = Status.SIGNEDIN;
             return "Successfully registered as %s".formatted(username);
         }
         else{
             throw new ClientError("Error: Expected <USERNAME> <PASSWORD> <EMAIL>");
         }
+    }
+
+    private void switchToLoggedIn(){
+        new PostloginClient(url).run();
     }
 }
