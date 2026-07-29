@@ -1,8 +1,10 @@
 package client;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
+import model.*;
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.ERASE_SCREEN;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
@@ -42,7 +44,7 @@ public class PostloginClient {
                 }
             }
             catch(Exception e){
-                System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR);
+                System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR + "\n");
             }
         }
 
@@ -98,8 +100,17 @@ public class PostloginClient {
     }
 
     private String list(){
+        List<GameData> games = facade.listGames(authToken);
 
-        return "";
+        String response = "";
+        for (GameData g : games) {
+            response += "Game #" + g.gameID() + "\t" + g.gameName() +
+                    "\n\tWhite: " + (g.whiteUsername() != null ? g.whiteUsername() : "") +
+                    "\n\tBlack: " + (g.blackUsername() != null ? g.blackUsername() : "") +
+                    "\n\n";
+        }
+
+        return response.substring(0, response.length() - 1);
     }
 
     private String join(String... params){
