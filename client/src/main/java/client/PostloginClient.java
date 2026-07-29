@@ -13,7 +13,7 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
 
 public class PostloginClient {
     private final ServerFacade facade;
-    private String authToken;
+    private final String authToken;
 
     public PostloginClient(ServerFacade facade, String authToken) {
         this.facade = facade;
@@ -62,7 +62,8 @@ public class PostloginClient {
             case "join" -> join(params);
             case "observe" -> observe(params);
             case "quit" -> quit();
-            default -> help();
+            case "help" -> help();
+            default -> throw new ClientError("Unrecognized command: " + cmd);
         };
     }
 
@@ -114,8 +115,15 @@ public class PostloginClient {
     }
 
     private String join(String... params){
-
-        return "";
+        if (params.length >= 2){
+            String id = params[0];
+            String color = params[1];
+            facade.joinGame(color, id, authToken);
+            return "Joined game #%s".formatted(id);
+        }
+        else{
+            throw new ClientError("Error: Expected <ID> [WHITE|BLACK]");
+        }
     }
 
     private String observe(String... params){

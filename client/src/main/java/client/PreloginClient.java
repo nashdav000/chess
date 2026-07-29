@@ -49,7 +49,8 @@ public class PreloginClient {
             case "register" -> register(params);
             case "login" -> login(params);
             case "quit" -> "quit";
-            default -> help();
+            case "help" -> help();
+            default -> throw new ClientError("Unrecognized command: " + cmd);
         };
     }
 
@@ -94,6 +95,7 @@ public class PreloginClient {
 
     private String switchToLoggedIn(){
         try {
+            System.out.print("\nType 'help' to see more commands.");
             return new PostloginClient(facade, authToken).run();
 
         } catch (Exception e) {
