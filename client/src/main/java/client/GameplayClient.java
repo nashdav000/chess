@@ -41,6 +41,10 @@ public class GameplayClient {
             try{
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
+
+                if (line.contains("leave") || line.contains("resign")){
+                    result = "quit";
+                }
             }
             catch(Exception e){
                 System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR + "\n");
@@ -97,12 +101,12 @@ public class GameplayClient {
 
     private String resign(){
 
-        return "";
+        return "Resigning from chess game\n";
     }
 
     private String leave(){
 
-        return "";
+        return "Leaving chess game\n";
     }
 
     private void drawBoard(){
@@ -119,7 +123,7 @@ public class GameplayClient {
 
         ChessBoard board = game.getBoard();
         String printedBoard =  SET_TEXT_COLOR_BLACK + SET_BG_COLOR_BLUE  +
-                "    h   g  f   e   d  c   b  a     " + RESET_BG_COLOR + "\n";
+                "    h   g  f   e   d  c   b   a    " + RESET_BG_COLOR + "\n";
         for (int i = 1; i < 9; i++){
 
             printedBoard += SET_BG_COLOR_BLUE + " " + (i) + " ";
@@ -132,7 +136,7 @@ public class GameplayClient {
             printedBoard += SET_BG_COLOR_BLUE + " " + (i) + " " + RESET_BG_COLOR + "\n";
         }
         printedBoard += SET_BG_COLOR_BLUE +
-                "    h   g  f   e   d  c   b  a     " + RESET_BG_COLOR + "\n" + RESET_TEXT_COLOR;
+                "    h   g  f   e   d  c   b   a    " + RESET_BG_COLOR + "\n" + RESET_TEXT_COLOR;
 
         System.out.println(printedBoard);
     }
