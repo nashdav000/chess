@@ -12,9 +12,9 @@ import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
 
 public class PreloginClient {
     private final ServerFacade facade;
-    private final String url;
+    private String authToken;
 
-    public PreloginClient(String url) {this.url = url; facade = new ServerFacade(url);}
+    public PreloginClient(String url) {facade = new ServerFacade(url);}
 
     public void run(){
         System.out.print("Welcome to 240 Chess. Type 'help' to get started.");
@@ -31,7 +31,9 @@ public class PreloginClient {
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
 
-                if (line.contains("login") || line.contains("register")){switchToLoggedIn();}
+                if (line.contains("login") || line.contains("register")){
+                    result = switchToLoggedIn();
+                }
             }
             catch(Exception e){
                 System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR + "\n");
@@ -64,11 +66,11 @@ public class PreloginClient {
                 RESET_TEXT_COLOR + "- with possible commands\n";
     }
 
-    private String login(String ... params) throws ClientError {
+    private String login(String... params) throws ClientError {
         if (params.length >= 2){
             String username = params[0];
             String password = params[1];
-            facade.login(username, password);
+            authToken = facade.login(username, password).authToken();
             return "Logged in as %s".formatted(username);
         }
         else{
@@ -77,12 +79,12 @@ public class PreloginClient {
 
     }
 
-    private String register(String ... params) throws ClientError {
+    private String register(String... params) throws ClientError {
         if (params.length >= 3){
             String username = params[0];
             String password = params[1];
             String email = params[2];
-            facade.register(new UserData(username, password, email));
+            authToken = facade.register(new UserData(username, password, email)).authToken();
             return "Successfully registered as %s".formatted(username);
         }
         else{
@@ -90,12 +92,13 @@ public class PreloginClient {
         }
     }
 
-    private void switchToLoggedIn(){
+    private String switchToLoggedIn(){
         try {
-            new PostloginClient(facade).run();
+            return new PostloginClient(facade, authToken).run();
 
         } catch (Exception e) {
             System.out.print("Error: Unable to log in. Try again later");
+            return "";
         }
     }
 }
