@@ -41,9 +41,9 @@ public class GameService {
                                             "Error: One or more fields were left blank");
         }
 
-        if (!request.playerColor().equals("BLACK") && !request.playerColor().equals("WHITE")){
+        if (!request.playerColor().equalsIgnoreCase("black") && !request.playerColor().equalsIgnoreCase("white")){
             throw new DataAccessException(DataAccessException.Type.BadRequest,
-                                        "Error: One or more fields were left blank");
+                                        "Error: Invalid color (Valid colors are WHITE or BLACK)");
         }
 
         // Get the game
@@ -55,34 +55,33 @@ public class GameService {
 
         GameData updatedGame = game;
 
-        switch (request.playerColor()){
-            case "BLACK":
+        updatedGame = switch (request.playerColor().toUpperCase()) {
+            case "BLACK" -> {
                 // Validate color
-                if (game.blackUsername() != null){
+                if (game.blackUsername() != null) {
                     throw new DataAccessException(DataAccessException.Type.AlreadyTaken,
                             "Error: already taken");
                 }
 
                 // Add player
-                updatedGame = new GameData(game.gameID(), game.whiteUsername(),
-                                authAccess.getAuth(request.authToken()), game.gameName(), game.chessGame());
-
-                break;
-
-            case "WHITE":
+                yield new GameData(game.gameID(), game.whiteUsername(),
+                        authAccess.getAuth(request.authToken()), game.gameName(), game.chessGame());
+            }
+            case "WHITE" -> {
 
                 // Validate color
-                if (game.whiteUsername() != null){
+                if (game.whiteUsername() != null) {
                     throw new DataAccessException(DataAccessException.Type.AlreadyTaken,
                             "Error: already taken");
                 }
 
                 // Add player
-                updatedGame = new GameData(game.gameID(),
+                yield new GameData(game.gameID(),
                         authAccess.getAuth(request.authToken()),
                         game.blackUsername(), game.gameName(), game.chessGame());
-                break;
-        }
+            }
+            default -> updatedGame;
+        };
 
         gameAccess.setGame(request.gameID(), updatedGame);
         return new JoinResult();

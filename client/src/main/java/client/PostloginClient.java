@@ -114,7 +114,7 @@ public class PostloginClient {
             String id = params[0];
             String color = params[1];
             facade.joinGame(color, id, authToken);
-            return "Joined game #%s".formatted(id);
+            return "Joined game #%s\n".formatted(id);
         }
         else{
             throw new ClientError("Error: Expected <ID> [WHITE|BLACK]");
