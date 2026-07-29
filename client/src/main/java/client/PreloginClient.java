@@ -17,7 +17,7 @@ public class PreloginClient {
     public PreloginClient(String url) {facade = new ServerFacade(url);}
 
     public void run(){
-        System.out.print("Welcome to 240 Chess. Type 'help' to get started.");
+        System.out.print("Welcome to 240 Chess. Type 'help' to get started.\n");
 
 
         Scanner scanner = new Scanner(System.in);

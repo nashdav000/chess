@@ -86,9 +86,15 @@ public class PostloginClient {
         return "Logged out\n";
     }
 
-    private String create(String... params){
-
-        return "";
+    private String create(String... params) throws ClientError {
+        if (params.length >= 1){
+            String gameName = params[0];
+            String id = facade.createGame(gameName, authToken);
+            return "Created game #%s: %s\n".formatted(id, gameName);
+        }
+        else{
+            throw new ClientError("Error: Expected <NAME>");
+        }
     }
 
     private String list(){
