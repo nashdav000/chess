@@ -3,12 +3,10 @@ package client;
 import chess.*;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.WHITE;
-import static chess.ChessPiece.PieceType.*;
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.ERASE_SCREEN;
 import static ui.EscapeSequences.RESET_TEXT_COLOR;
@@ -27,7 +25,7 @@ public class GameplayClient {
         this.game = game;
     }
 
-    public String run(){
+    public void run(){
         System.out.println();
         drawBoard();
 
@@ -50,8 +48,6 @@ public class GameplayClient {
                 System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR + "\n");
             }
         }
-
-        return "";
     }
 
     private String eval(String input) throws ClientError {
