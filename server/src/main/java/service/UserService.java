@@ -4,11 +4,8 @@ import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.UserData;
-import org.junit.jupiter.api.Assertions;
 import org.mindrot.jbcrypt.BCrypt;
 import service.user.classes.*;
-
-import java.util.Objects;
 
 
 public class UserService {

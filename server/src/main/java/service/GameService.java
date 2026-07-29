@@ -72,7 +72,7 @@ public class GameService {
                 // Validate color
                 if (game.whiteUsername() != null) {
                     throw new DataAccessException(DataAccessException.Type.AlreadyTaken,
-                            "Error: already taken");
+                            "Error: Color already taken");
                 }
 
                 // Add player
