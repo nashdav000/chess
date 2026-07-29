@@ -2,6 +2,7 @@ package client;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import model.*;
@@ -117,7 +118,8 @@ public class PostloginClient {
             String id = params[0];
             String color = params[1];
             facade.joinGame(color, id, authToken);
-            return "Joined game #%s\n".formatted(id);
+            switchtoGameplay(color, id);
+            return "";
         }
         else{
             throw new ClientError("Error: Expected <ID> [WHITE|BLACK]");
@@ -132,5 +134,18 @@ public class PostloginClient {
     private String quit(){
         facade.logout(authToken);
         return "quit";
+    }
+
+    private void switchtoGameplay(String color, String id){
+        try {
+            for (GameData g : facade.listGames(authToken)){
+                if (Objects.equals(g.gameID(), id)){
+                    new GameplayClient(facade, color, g.chessGame()).run();
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.print("Error: Unable to log in. Try again later");
+        }
     }
 }
