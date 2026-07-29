@@ -70,18 +70,13 @@ public class PostloginClient {
     private void promptUser(){System.out.print("\n" + ERASE_SCREEN + "[LOGGED IN] >>> " + SET_TEXT_COLOR_GREEN);}
 
     private String help(){
-        return SET_TEXT_COLOR_YELLOW + "create <NAME> " +
-                RESET_TEXT_COLOR + "- a game\n" +
-                SET_TEXT_COLOR_YELLOW + "list " +
-                RESET_TEXT_COLOR + "- games\n" +
-                SET_TEXT_COLOR_YELLOW + "join <ID> [WHITE|BLACK] " +
-                RESET_TEXT_COLOR + "- a game\n" +
-                SET_TEXT_COLOR_YELLOW + "logout " +
-                RESET_TEXT_COLOR + "- when you are done\n" +
-                SET_TEXT_COLOR_YELLOW + "quit " +
-                RESET_TEXT_COLOR + "- playing chess\n" +
-                SET_TEXT_COLOR_YELLOW + "help " +
-                RESET_TEXT_COLOR + "- with possible commands\n";
+        return SET_TEXT_COLOR_YELLOW +
+                "Create a new game: 'create <NAME>'\n" +
+                "List all games: 'list'\n" +
+                "Join a game: 'join <ID> [WHITE|BLACK]'\n" +
+                "Logout: 'logout'\n" +
+                "Quit the program: 'quit'\n" +
+                "Display the help menu: 'help'\n";
     }
 
     private String logout(){

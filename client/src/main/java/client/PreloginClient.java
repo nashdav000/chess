@@ -57,14 +57,11 @@ public class PreloginClient {
     private void promptUser(){System.out.print("\n" + ERASE_SCREEN + "[LOGGED OUT] >>> " + SET_TEXT_COLOR_GREEN);}
 
     private String help(){
-        return SET_TEXT_COLOR_YELLOW + "register <USERNAME> <PASSWORD> <EMAIL> " +
-                RESET_TEXT_COLOR + "- register new user\n" +
-                SET_TEXT_COLOR_YELLOW + "login <USERNAME> <PASSWORD> " +
-                RESET_TEXT_COLOR + "- to play chess\n" +
-                SET_TEXT_COLOR_YELLOW + "quit " +
-                RESET_TEXT_COLOR + "- playing chess\n" +
-                SET_TEXT_COLOR_YELLOW + "help " +
-                RESET_TEXT_COLOR + "- with possible commands\n";
+        return SET_TEXT_COLOR_YELLOW +
+                "Register a new user: 'register <USERNAME> <PASSWORD> <EMAIL>'\n" +
+                "Login an existing user: 'login <USERNAME> <PASSWORD>'\n" +
+                "Quit the program: 'quit'\n" +
+                "Display the help menu: 'help'\n";
     }
 
     private String login(String... params) throws ClientError {
@@ -95,7 +92,7 @@ public class PreloginClient {
 
     private String switchToLoggedIn(){
         try {
-            System.out.print("\nType 'help' to see more commands.");
+            System.out.print("\nType 'help' to display the help menu.");
             return new PostloginClient(facade, authToken).run();
 
         } catch (Exception e) {
