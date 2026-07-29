@@ -31,19 +31,19 @@ public class PreloginClient {
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
 
-                if (result.equals("login") || result.equals("register")){switchToLoggedIn();}
+                if (line.contains("login") || line.contains("register")){switchToLoggedIn();}
             }
             catch(Exception e){
-                System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR);
+                System.out.print(SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR + "\n");
             }
         }
     }
 
     private String eval(String input) throws ClientError {
-        String[] tokens = input.toLowerCase().split(" ");
+        String[] tokens = input.split(" ");
         String cmd = (tokens.length > 0) ? tokens[0] : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        return switch(cmd){
+        return switch(cmd.toLowerCase()){
             case "register" -> register(params);
             case "login" -> login(params);
             case "quit" -> "quit";
@@ -51,7 +51,7 @@ public class PreloginClient {
         };
     }
 
-    private void promptUser(){System.out.print("\n" + ERASE_SCREEN + ">>> " + SET_TEXT_COLOR_GREEN);}
+    private void promptUser(){System.out.print("\n" + ERASE_SCREEN + "[LOGGED OUT] >>> " + SET_TEXT_COLOR_GREEN);}
 
     private String help(){
         return SET_TEXT_COLOR_YELLOW + "register <USERNAME> <PASSWORD> <EMAIL> " +
@@ -61,7 +61,7 @@ public class PreloginClient {
                 SET_TEXT_COLOR_YELLOW + "quit " +
                 RESET_TEXT_COLOR + "- playing chess\n" +
                 SET_TEXT_COLOR_YELLOW + "help " +
-                RESET_TEXT_COLOR + "- with possible commands";
+                RESET_TEXT_COLOR + "- with possible commands\n";
     }
 
     private String login(String ... params) throws ClientError {
@@ -91,6 +91,11 @@ public class PreloginClient {
     }
 
     private void switchToLoggedIn(){
-        new PostloginClient(url).run();
+        try {
+            new PostloginClient(facade).run();
+
+        } catch (Exception e) {
+            System.out.print("Error: Unable to log in. Try again later");
+        }
     }
 }
