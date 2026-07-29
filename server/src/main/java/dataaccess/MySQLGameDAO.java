@@ -43,7 +43,7 @@ public class MySQLGameDAO implements GameDAO {
             gameID = rs.getInt("id") + 1;
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to find ID");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Error: Could not create game");
         }
 
         ChessGame game = new ChessGame();
@@ -72,7 +72,7 @@ public class MySQLGameDAO implements GameDAO {
             return games;
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to list games");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Error: Unable to list games");
         }
     }
 
@@ -93,7 +93,7 @@ public class MySQLGameDAO implements GameDAO {
             return null;
         }
         catch(Exception e){
-            throw new DataAccessException(DataAccessException.Type.SQL, "Unable to get games");
+            throw new DataAccessException(DataAccessException.Type.SQL, "Error: Invalid game id");
         }
     }
 

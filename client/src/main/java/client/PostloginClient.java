@@ -108,7 +108,8 @@ public class PostloginClient {
                     "\n\n";
         }
 
-        return response.substring(0, response.length() - 1);
+        return response.isEmpty() ? "No games. Consider creating one!\n" :
+                response.substring(0, response.length() - 1);
     }
 
     private String join(String... params){
