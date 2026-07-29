@@ -76,6 +76,7 @@ public class PostloginClient {
                 Create a new game: 'create <NAME>'
                 List all games: 'list'
                 Join a game: 'join <ID> [WHITE|BLACK]'
+                Observe a game: 'observe <ID>'
                 Logout: 'logout'
                 Quit the program: 'quit'
                 Display the help menu: 'help'
@@ -127,8 +128,14 @@ public class PostloginClient {
     }
 
     private String observe(String... params){
-
-        return "";
+        if (params.length >= 1){
+            String id = params[0];
+            switchtoGameplay("", id);
+            return "";
+        }
+        else{
+            throw new ClientError("Error: Expected <ID>");
+        }
     }
 
     private String quit(){
@@ -145,7 +152,7 @@ public class PostloginClient {
             }
 
         } catch (Exception e) {
-            System.out.print("Error: Unable to log in. Try again later");
+            System.out.print("Error: Unable to log in. Try again later\n");
         }
     }
 }
