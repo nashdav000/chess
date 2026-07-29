@@ -58,10 +58,13 @@ public class PreloginClient {
 
     private String help(){
         return SET_TEXT_COLOR_YELLOW +
-                "Register a new user: 'register <USERNAME> <PASSWORD> <EMAIL>'\n" +
-                "Login an existing user: 'login <USERNAME> <PASSWORD>'\n" +
-                "Quit the program: 'quit'\n" +
-                "Display the help menu: 'help'\n";
+                """
+                Register a new user: 'register <USERNAME> <PASSWORD> <EMAIL>'
+                Login an existing user: 'login <USERNAME> <PASSWORD>'
+                Quit the program: 'quit'
+                Display the help menu: 'help'
+                """;
+
     }
 
     private String login(String... params) throws ClientError {

@@ -71,12 +71,14 @@ public class PostloginClient {
 
     private String help(){
         return SET_TEXT_COLOR_YELLOW +
-                "Create a new game: 'create <NAME>'\n" +
-                "List all games: 'list'\n" +
-                "Join a game: 'join <ID> [WHITE|BLACK]'\n" +
-                "Logout: 'logout'\n" +
-                "Quit the program: 'quit'\n" +
-                "Display the help menu: 'help'\n";
+                """
+                Create a new game: 'create <NAME>'
+                List all games: 'list'
+                Join a game: 'join <ID> [WHITE|BLACK]'
+                Logout: 'logout'
+                Quit the program: 'quit'
+                Display the help menu: 'help'
+                """;
     }
 
     private String logout(){
