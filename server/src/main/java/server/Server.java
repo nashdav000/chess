@@ -8,12 +8,12 @@ import io.javalin.http.Context;
 import service.*;
 import service.game.classes.*;
 import service.user.classes.*;
-
 import java.util.Map;
 
 public class Server {
 
     private final Javalin javalin;
+    private final WebSocketHandler webSocketHandler;
     private final UserService userService;
     private final GameService gameService;
 
@@ -35,6 +35,7 @@ public class Server {
 
         this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
+        webSocketHandler = new WebSocketHandler();
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -51,6 +52,14 @@ public class Server {
         // Clear Endpoint
         javalin.delete("/db", this::clear);
 
+        // Websocket Endpoint
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
+
+        // Exception Endpoint
         javalin.exception(DataAccessException.class, this::exceptionHandler);
     }
 
