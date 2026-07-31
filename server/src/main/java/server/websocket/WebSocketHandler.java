@@ -1,13 +1,17 @@
-package server;
+package server.websocket;
 
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
+import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
+
+import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCloseHandler {
 
-
+    private final ConnectionManager connections = new ConnectionManager();
 
 
     @Override
@@ -21,9 +25,9 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         try {
             UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (command.getCommandType()){
-                case CONNECT -> connect();
+                case CONNECT -> connect(command.getGameID().toString(), ctx.session);
                 case MAKE_MOVE -> makeMove();
-                case LEAVE -> leave();
+                case LEAVE -> leave(ctx.session);
                 case RESIGN -> resign();
             }
         }
@@ -37,16 +41,18 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         System.out.println("Websocket closed");
     }
 
-    private void connect(){
-
+    private void connect(String gameID, Session session) throws IOException {
+        connections.add(gameID, session);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        connections.broadcast(session, notification);
     }
 
     private void makeMove(){
 
     }
 
-    private void leave(){
-
+    private void leave(Session session){
+        connections.remove(session);
     }
 
     private void resign(){

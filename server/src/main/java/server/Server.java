@@ -5,6 +5,7 @@ import dataaccess.DataAccessException;
 import dataaccess.*;
 import io.javalin.*;
 import io.javalin.http.Context;
+import server.websocket.WebSocketHandler;
 import service.*;
 import service.game.classes.*;
 import service.user.classes.*;
