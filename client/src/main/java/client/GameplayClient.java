@@ -6,10 +6,6 @@ import java.util.*;
 
 import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
-import static ui.EscapeSequences.ERASE_SCREEN;
-import static ui.EscapeSequences.RESET_TEXT_COLOR;
-import static ui.EscapeSequences.SET_TEXT_COLOR_GREEN;
-import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
 
 public class GameplayClient {
 
@@ -35,27 +31,10 @@ public class GameplayClient {
             String line = scanner.nextLine();
 
             try{
-                // Resignation Confirmation
-                if (line.contains("resign")){
-                    System.out.print(SET_TEXT_COLOR_BLUE + "Confirm resignation? (Y/N)   " + RESET_TEXT_COLOR);
-                    String resign = scanner.nextLine();
-                    if (!resign.toLowerCase().contains("y")){
-                        continue;
-                    }
-                }
-                // Leave Confirmation
-                if (line.contains("leave")){
-                    System.out.print(SET_TEXT_COLOR_BLUE + "Confirm leave? (Y/N)   " + RESET_TEXT_COLOR);
-                    String leaving = scanner.nextLine();
-                    if (!leaving.toLowerCase().contains("y")){
-                        continue;
-                    }
-                }
-
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
 
-                if (line.contains("leave") || line.contains("resign")){
+                if (result.contains("Left") || result.contains("Resigned")){
                     result = "quit";
                 }
             }
@@ -155,10 +134,24 @@ public class GameplayClient {
     }
 
     private String resign(){
+        // Resignation Confirmation
+        System.out.print(SET_TEXT_COLOR_BLUE + "Confirm resignation? (Y/N)   " + RESET_TEXT_COLOR);
+        String s = new Scanner(System.in).nextLine();
+        if (!s.toLowerCase().contains("y")){
+            return "";
+        }
+
         return "Resigned from chess game\n";
     }
 
     private String leave(){
+        // Leave Confirmation
+            System.out.print(SET_TEXT_COLOR_BLUE + "Confirm leave? (Y/N)   " + RESET_TEXT_COLOR);
+            String leaving = new Scanner(System.in).nextLine();
+            if (!leaving.toLowerCase().contains("y")){
+                return "";
+            }
+
         return "Left chess game\n";
     }
 
