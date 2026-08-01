@@ -35,6 +35,23 @@ public class GameplayClient {
             String line = scanner.nextLine();
 
             try{
+                // Resignation Confirmation
+                if (line.contains("resign")){
+                    System.out.print(SET_TEXT_COLOR_BLUE + "Confirm resignation? (Y/N)   " + RESET_TEXT_COLOR);
+                    String resign = scanner.nextLine();
+                    if (!resign.toLowerCase().contains("y")){
+                        continue;
+                    }
+                }
+                // Leave Confirmation
+                if (line.contains("leave")){
+                    System.out.print(SET_TEXT_COLOR_BLUE + "Confirm leave? (Y/N)   " + RESET_TEXT_COLOR);
+                    String leaving = scanner.nextLine();
+                    if (!leaving.toLowerCase().contains("y")){
+                        continue;
+                    }
+                }
+
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
 
@@ -138,13 +155,11 @@ public class GameplayClient {
     }
 
     private String resign(){
-
-        return "Resigning from chess game\n";
+        return "Resigned from chess game\n";
     }
 
     private String leave(){
-
-        return "Leaving chess game\n";
+        return "Left chess game\n";
     }
 
     private void drawBoard(ArrayList<ChessPosition> positions){
@@ -166,6 +181,8 @@ public class GameplayClient {
             printedBoard += SET_BG_COLOR_BLUE + " " + (i) + " ";
 
             for (int j = 1; j < 9; j++){
+
+                // Highlight Board Drawing
                 if (positions != null && Objects.equals(positions.getFirst(), new ChessPosition(i, 9 - j))){
                     printedBoard += SET_BG_COLOR_MAGENTA;
                 }
@@ -177,6 +194,7 @@ public class GameplayClient {
                         printedBoard += SET_BG_COLOR_DARK_GREEN;
                     }
                 }
+                // Normal Board Drawing
                 else if ((i + j) % 2 == 0){
                     printedBoard += SET_BG_COLOR_LIGHT_GREY;
                 }
@@ -206,6 +224,7 @@ public class GameplayClient {
 
             for (int j = 1; j < 9; j++){
 
+                // Highlight Board Drawing
                 if (positions != null && Objects.equals(positions.getFirst(), new ChessPosition(9 - i, j))){
                     printedBoard += SET_BG_COLOR_MAGENTA;
                 }
@@ -217,6 +236,7 @@ public class GameplayClient {
                         printedBoard += SET_BG_COLOR_DARK_GREEN;
                     }
                 }
+                // Normal Board Drawing
                 else if ((i + j) % 2 == 0){
                     printedBoard += SET_BG_COLOR_LIGHT_GREY;
                 }
