@@ -52,7 +52,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
     }
 
     private void leave(Session session){
-        connections.remove(session);
+        
     }
 
     private void resign(){

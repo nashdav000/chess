@@ -2,9 +2,7 @@ package client;
 
 import chess.*;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Scanner;
+import java.util.*;
 
 import static chess.ChessGame.TeamColor.WHITE;
 import static ui.EscapeSequences.*;
@@ -27,7 +25,7 @@ public class GameplayClient {
 
     public void run(){
         System.out.println();
-        drawBoard();
+        drawBoard(null);
 
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -80,18 +78,62 @@ public class GameplayClient {
 
     }
 
-    private String highlight(String... params){
+    private String highlight(String... params) throws ClientError {
+        if (params.length >= 1){
+            String move = params[0];
 
-        return "";
+            if (!move.matches("^[a-h][1-8]$")){
+                throw new ClientError("Error: %s is not a valid chess position".formatted(move));
+            }
+
+            int row  = move.charAt(1) - '0';
+            int col = convertColToInt(move.charAt(0));
+
+            Collection<ChessMove> moves = game.validMoves(new ChessPosition(row, col));
+
+            ArrayList<ChessPosition> positions = new ArrayList<>();
+            positions.add(new ChessPosition(row, col));
+
+            if (moves != null){
+                for (ChessMove m : moves){
+                    positions.add(m.getEndPosition());
+                }
+            }
+
+            drawBoard(positions);
+            return "";
+        }
+        else {
+            throw new ClientError("Error: Expected <position>");
+        }
+
+    }
+
+    private int convertColToInt(char letter){
+        return switch(letter) {
+            case 'a' -> 1;
+            case 'b' -> 2;
+            case 'c' -> 3;
+            case 'd' -> 4;
+            case 'e' -> 5;
+            case 'f' -> 6;
+            case 'g' -> 7;
+            case 'h' -> 8;
+            default -> -1;
+        };
     }
 
     private String move(String... params){
 
+        String movement = "";
+        if (params.length >= 2 && params[1].matches("[a-h][1-8]")){
+            movement += params[1];
+        }
         return "";
     }
 
     private String redraw(){
-
+        drawBoard(null);
         return "";
     }
 
@@ -105,17 +147,16 @@ public class GameplayClient {
         return "Leaving chess game\n";
     }
 
-    private void drawBoard(){
+    private void drawBoard(ArrayList<ChessPosition> positions){
         if (Objects.equals(color, "black")){
-            drawBlackBoard();
+            drawBlackBoard(positions);
         }
         else{
-            drawWhiteBoard();
+            drawWhiteBoard(positions);
         }
     }
 
-
-    private void drawBlackBoard(){
+    private void drawBlackBoard(ArrayList<ChessPosition> positions){
 
         ChessBoard board = game.getBoard();
         String printedBoard =  SET_TEXT_COLOR_BLACK + SET_BG_COLOR_BLUE  +
@@ -125,8 +166,25 @@ public class GameplayClient {
             printedBoard += SET_BG_COLOR_BLUE + " " + (i) + " ";
 
             for (int j = 1; j < 9; j++){
-                printedBoard += ((i + j) % 2 == 0 ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY) +
-                    getPiece(board.getPiece(new ChessPosition(i, 9 - j)));
+                if (positions != null && Objects.equals(positions.getFirst(), new ChessPosition(i, 9 - j))){
+                    printedBoard += SET_BG_COLOR_MAGENTA;
+                }
+                else if (positions != null && positions.contains(new ChessPosition(i, 9 - j))){
+                    if ((i + j) % 2 == 0){
+                        printedBoard += SET_BG_COLOR_GREEN;
+                    }
+                    else{
+                        printedBoard += SET_BG_COLOR_DARK_GREEN;
+                    }
+                }
+                else if ((i + j) % 2 == 0){
+                    printedBoard += SET_BG_COLOR_LIGHT_GREY;
+                }
+                else{
+                    printedBoard += SET_BG_COLOR_DARK_GREY;
+                }
+
+                printedBoard += getPiece(board.getPiece(new ChessPosition(i, 9 - j)));
             }
 
             printedBoard += SET_BG_COLOR_BLUE + " " + (i) + " " + RESET_BG_COLOR + "\n";
@@ -137,7 +195,7 @@ public class GameplayClient {
         System.out.println(printedBoard);
     }
 
-    private void drawWhiteBoard(){
+    private void drawWhiteBoard(ArrayList<ChessPosition> positions){
 
         ChessBoard board = game.getBoard();
         String printedBoard =  SET_TEXT_COLOR_BLACK + SET_BG_COLOR_BLUE  +
@@ -147,8 +205,26 @@ public class GameplayClient {
             printedBoard += SET_BG_COLOR_BLUE + " " + (9 - i) + " ";
 
             for (int j = 1; j < 9; j++){
-                printedBoard += ((i + j) % 2 == 0 ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY) +
-                        getPiece(board.getPiece(new ChessPosition(9 - i, j)));
+
+                if (positions != null && Objects.equals(positions.getFirst(), new ChessPosition(9 - i, j))){
+                    printedBoard += SET_BG_COLOR_MAGENTA;
+                }
+                else if (positions != null && positions.contains(new ChessPosition(9 - i, j))){
+                    if ((i + j) % 2 == 0){
+                        printedBoard += SET_BG_COLOR_GREEN;
+                    }
+                    else{
+                        printedBoard += SET_BG_COLOR_DARK_GREEN;
+                    }
+                }
+                else if ((i + j) % 2 == 0){
+                    printedBoard += SET_BG_COLOR_LIGHT_GREY;
+                }
+                else{
+                    printedBoard += SET_BG_COLOR_DARK_GREY;
+                }
+
+                printedBoard += getPiece(board.getPiece(new ChessPosition(9 - i, j)));
             }
 
             printedBoard += SET_BG_COLOR_BLUE + " " + (9 - i) + " " + RESET_BG_COLOR + "\n";
