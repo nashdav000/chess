@@ -34,7 +34,7 @@ public class GameplayClient {
                 result = eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result + RESET_TEXT_COLOR);
 
-                if (result.contains("Left") || result.contains("Resigned")){
+                if (result.contains("Left")){
                     result = "quit";
                 }
             }
@@ -71,7 +71,6 @@ public class GameplayClient {
                "Leave game: 'leave'
                "Display the help menu: 'help'
                """;
-
     }
 
     private String highlight(String... params) throws ClientError {
