@@ -4,18 +4,25 @@ import chess.*;
 
 import java.util.*;
 
-import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessGame.TeamColor.*;
+import static chess.ChessPiece.PieceType.*;
+import static chess.ChessGame.TeamColor;
 import static ui.EscapeSequences.*;
+
 
 public class GameplayClient {
 
     private final ServerFacade facade;
-    private final String color;
+    private final TeamColor playerColor;
     private final ChessGame game;
 
     public GameplayClient(ServerFacade facade, String color, ChessGame game) {
         this.facade = facade;
-        this.color = color.toLowerCase();
+        this.playerColor = switch(color.toLowerCase()){
+            case "white" -> WHITE;
+            case "black" -> BLACK;
+            default -> null;
+        };
         this.game = game;
     }
 
@@ -65,7 +72,7 @@ public class GameplayClient {
         return SET_TEXT_COLOR_YELLOW +
                """
                "Highlight legal moves: 'highlight <position>' (e.g. f5)
-               "Make a move: 'move <source> <destination> <optional promotion>' (e.g f5 e4 q)
+               "Make a move: 'move <start> <end> <optional promotion>' (e.g f5 e4 q)
                "Redraw chess board: 'redraw'
                "Resign from game: 'resign'
                "Leave game: 'leave'
@@ -118,13 +125,44 @@ public class GameplayClient {
         };
     }
 
-    private String move(String... params){
-
-        String movement = "";
-        if (params.length >= 2 && params[1].matches("[a-h][1-8]")){
-            movement += params[1];
+    private String move(String... params) throws ClientError {
+        if (playerColor == null){
+            throw new ClientError("Error: Observers can't make moves\n");
         }
-        return "";
+
+        if (params.length >= 2){
+            if (!params[0].matches("^[a-h][1-8]$") || !params[1].matches("^[a-h][1-8]$")){
+                throw new ClientError("Error: %s %s is not valid position".formatted(params[0], params[1]));
+            }
+
+            ChessPosition start = new ChessPosition(params[0].charAt(1) - '0', convertColToInt(params[0].charAt(0)));
+            ChessPosition end = new ChessPosition(params[1].charAt(1) - '0', convertColToInt(params[1].charAt(0)));
+
+            ChessPiece.PieceType promo = params.length == 2 ? null : switch(params[2]){
+                case "q", "queen" -> QUEEN;
+                case "b", "bishop" -> BISHOP;
+                case "r", "rook" -> ROOK;
+                case "n", "knight", "k" -> KNIGHT;
+                default -> null;
+            };
+
+            if (playerColor != game.getBoard().getPiece(start).getTeamColor()){
+                throw new ClientError("Error: Cannot move opponent's pieces");
+            }
+
+            try {
+                game.makeMove(new ChessMove(start, end, promo));
+                redraw();
+                return "";
+            }
+            catch (InvalidMoveException e) {
+                throw new ClientError("Error: %s\n".formatted(e.getMessage()));
+            }
+        }
+        else{
+            throw new ClientError("Error: Expected <start> <end> <optional promotion>");
+        }
+
     }
 
     private String redraw(){
@@ -155,7 +193,7 @@ public class GameplayClient {
     }
 
     private void drawBoard(ArrayList<ChessPosition> positions){
-        if (Objects.equals(color, "black")){
+        if (Objects.equals(playerColor, BLACK)){
             drawBlackBoard(positions);
         }
         else{
