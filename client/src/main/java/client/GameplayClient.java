@@ -20,8 +20,10 @@ public class GameplayClient implements NotificationHandler {
 
     private final TeamColor playerColor;
     private final ChessGame game;
+    private final String gameID;
+    private final String authToken;
 
-    public GameplayClient(ServerFacade facade, String color, ChessGame game) {
+    public GameplayClient(ServerFacade facade, String color, ChessGame game, String id, String authToken) {
         this.facade = facade;
         ws = new WebsocketCommunicator(facade.URL(), this);
         this.playerColor = switch(color.toLowerCase()){
@@ -30,11 +32,14 @@ public class GameplayClient implements NotificationHandler {
             default -> null;
         };
         this.game = game;
+        this.gameID = id;
+        this.authToken = authToken;
     }
 
     public void run(){
         System.out.println();
         drawBoard(null);
+        ws.connect(authToken, gameID);
 
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -341,6 +346,7 @@ public class GameplayClient implements NotificationHandler {
 
     //===== Websocket Functions
     public void notify(ServerMessage msg) {
-        System.out.print(ERASE_LINE + SET_BG_COLOR_DARK_GREEN + msg + RESET_TEXT_COLOR);
+        System.out.print(ERASE_LINE + SET_BG_COLOR_DARK_GREEN + msg.getServerMessageType() + RESET_TEXT_COLOR);
+        promptUser();
     }
 }

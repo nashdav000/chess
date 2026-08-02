@@ -147,7 +147,7 @@ public class PostloginClient {
         try {
             for (GameData g : facade.listGames(authToken)){
                 if (Objects.equals(g.gameID(), id)){
-                    new GameplayClient(facade, color, g.chessGame()).run();
+                    new GameplayClient(facade, color, g.chessGame(), id, authToken).run();
                 }
             }
 
