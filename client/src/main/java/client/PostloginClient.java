@@ -152,7 +152,7 @@ public class PostloginClient {
             }
 
         } catch (Exception e) {
-            System.out.print("Error: Unable to log in. Try again later\n");
+            System.out.print("Error: Unable to initiate gameplay. Try again later\n");
         }
     }
 }

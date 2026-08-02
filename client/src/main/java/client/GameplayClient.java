@@ -127,7 +127,7 @@ public class GameplayClient {
 
     private String move(String... params) throws ClientError {
         if (playerColor == null){
-            throw new ClientError("Error: Observers can't make moves\n");
+            throw new ClientError("Error: Observers can't make moves");
         }
 
         if (params.length >= 2){
@@ -156,7 +156,7 @@ public class GameplayClient {
                 return "";
             }
             catch (InvalidMoveException e) {
-                throw new ClientError("Error: %s\n".formatted(e.getMessage()));
+                throw new ClientError("Error: %s".formatted(e.getMessage()));
             }
         }
         else{
