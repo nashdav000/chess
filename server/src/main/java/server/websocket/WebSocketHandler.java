@@ -5,6 +5,7 @@ import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
 
     private void connect(String gameID, Session session) throws IOException {
         connections.add(gameID, session);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        var notification = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID);
         connections.broadcast(session, notification);
     }
 
@@ -52,7 +53,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
     }
 
     private void leave(Session session){
-        
+
     }
 
     private void resign(){
