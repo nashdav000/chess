@@ -126,6 +126,10 @@ public class GameplayClient {
     }
 
     private String move(String... params) throws ClientError {
+        if (!checkIfGameOver().isEmpty()) {
+            throw new ClientError ("Error: Game is over");
+        }
+
         if (playerColor == null){
             throw new ClientError("Error: Observers can't make moves");
         }
@@ -153,7 +157,7 @@ public class GameplayClient {
             try {
                 game.makeMove(new ChessMove(start, end, promo));
                 redraw();
-                return "";
+                return checkIfGameOver();
             }
             catch (InvalidMoveException e) {
                 throw new ClientError("Error: %s".formatted(e.getMessage()));
@@ -165,9 +169,24 @@ public class GameplayClient {
 
     }
 
+    private String checkIfGameOver(){
+        if (game.isInCheckmate(BLACK)) {
+            return "Game over: White wins";
+        }
+        if (game.isInCheckmate(WHITE)) {
+            return "Game over: Black wins";
+        }
+        if (game.isInStalemate(BLACK) || game.isInStalemate(WHITE)) {
+            return "Game over: Stalemate";
+        }
+
+        return "";
+    }
+
+
     private String redraw(){
         drawBoard(null);
-        return "";
+        return checkIfGameOver();
     }
 
     private String resign(){
@@ -183,11 +202,11 @@ public class GameplayClient {
 
     private String leave(){
         // Leave Confirmation
-            System.out.print(SET_TEXT_COLOR_BLUE + "Confirm leave? (Y/N)   " + RESET_TEXT_COLOR);
-            String leaving = new Scanner(System.in).nextLine();
-            if (!leaving.toLowerCase().contains("y")){
-                return "";
-            }
+        System.out.print(SET_TEXT_COLOR_BLUE + "Confirm leave? (Y/N)   " + RESET_TEXT_COLOR);
+        String leaving = new Scanner(System.in).nextLine();
+        if (!leaving.toLowerCase().contains("y")){
+            return "";
+        }
 
         return "Left chess game\n";
     }
