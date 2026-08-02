@@ -1,6 +1,7 @@
 package server.websocket;
 
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
@@ -18,12 +19,12 @@ public class ConnectionManager {
     }
 
     public void broadcast(Session excludedSession, ServerMessage message) throws IOException {
-        String msg = message.toString();
+        String msg = new Gson().toJson(message);
         String gameID = connections.get(excludedSession);
 
         for (Session s : connections.keySet()){
             if (s.isOpen()){
-                if (Objects.equals(connections.get(s), gameID) && !s.equals(excludedSession)){
+                if (Objects.equals(connections.get(s), gameID)){
                     s.getRemote().sendString(msg);
                 }
             }
