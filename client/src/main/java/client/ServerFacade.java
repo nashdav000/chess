@@ -67,8 +67,7 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-
-
+    //================== Helper functions
 
     private HttpRequest buildRequest(String method, String path, Object body, String authToken){
         var request = HttpRequest.newBuilder()

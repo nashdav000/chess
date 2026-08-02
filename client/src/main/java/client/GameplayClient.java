@@ -111,6 +111,7 @@ public class GameplayClient {
 
     }
 
+    // Highlight and move helper function
     private int convertColToInt(char letter){
         return switch(letter) {
             case 'a' -> 1;
@@ -169,6 +170,7 @@ public class GameplayClient {
 
     }
 
+    // Move and redraw helper function
     private String checkIfGameOver(){
         if (game.isInCheckmate(BLACK)) {
             return "Game over: White wins";
@@ -182,7 +184,6 @@ public class GameplayClient {
 
         return "";
     }
-
 
     private String redraw(){
         drawBoard(null);
