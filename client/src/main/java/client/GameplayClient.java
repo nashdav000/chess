@@ -1,6 +1,9 @@
 package client;
 
 import chess.*;
+import client.websocket.NotificationHandler;
+import client.websocket.WebsocketCommunicator;
+import websocket.messages.ServerMessage;
 
 import java.util.*;
 
@@ -10,14 +13,17 @@ import static chess.ChessGame.TeamColor;
 import static ui.EscapeSequences.*;
 
 
-public class GameplayClient {
+public class GameplayClient implements NotificationHandler {
 
     private final ServerFacade facade;
+    private final WebsocketCommunicator ws;
+
     private final TeamColor playerColor;
     private final ChessGame game;
 
     public GameplayClient(ServerFacade facade, String color, ChessGame game) {
         this.facade = facade;
+        ws = new WebsocketCommunicator(facade.URL(), this);
         this.playerColor = switch(color.toLowerCase()){
             case "white" -> WHITE;
             case "black" -> BLACK;
@@ -68,6 +74,8 @@ public class GameplayClient {
 
     private void promptUser(){System.out.print("\n" + ERASE_SCREEN + "[GAMEPLAY] >>> " + SET_TEXT_COLOR_GREEN);}
 
+    //===== User Actions Functions
+
     private String help(){
         return SET_TEXT_COLOR_YELLOW +
                """
@@ -109,21 +117,6 @@ public class GameplayClient {
             throw new ClientError("Error: Expected <position>");
         }
 
-    }
-
-    // Highlight and move helper function
-    private int convertColToInt(char letter){
-        return switch(letter) {
-            case 'a' -> 1;
-            case 'b' -> 2;
-            case 'c' -> 3;
-            case 'd' -> 4;
-            case 'e' -> 5;
-            case 'f' -> 6;
-            case 'g' -> 7;
-            case 'h' -> 8;
-            default -> -1;
-        };
     }
 
     private String move(String... params) throws ClientError {
@@ -170,21 +163,6 @@ public class GameplayClient {
 
     }
 
-    // Move and redraw helper function
-    private String checkIfGameOver(){
-        if (game.isInCheckmate(BLACK)) {
-            return "Game over: White wins";
-        }
-        if (game.isInCheckmate(WHITE)) {
-            return "Game over: Black wins";
-        }
-        if (game.isInStalemate(BLACK) || game.isInStalemate(WHITE)) {
-            return "Game over: Stalemate";
-        }
-
-        return "";
-    }
-
     private String redraw(){
         drawBoard(null);
         return checkIfGameOver();
@@ -210,6 +188,35 @@ public class GameplayClient {
         }
 
         return "Left chess game\n";
+    }
+
+    //====== User Actions Helper Functions
+    private int convertColToInt(char letter){
+        return switch(letter) {
+            case 'a' -> 1;
+            case 'b' -> 2;
+            case 'c' -> 3;
+            case 'd' -> 4;
+            case 'e' -> 5;
+            case 'f' -> 6;
+            case 'g' -> 7;
+            case 'h' -> 8;
+            default -> -1;
+        };
+    }
+
+    private String checkIfGameOver(){
+        if (game.isInCheckmate(BLACK)) {
+            return "Game over: White wins";
+        }
+        if (game.isInCheckmate(WHITE)) {
+            return "Game over: Black wins";
+        }
+        if (game.isInStalemate(BLACK) || game.isInStalemate(WHITE)) {
+            return "Game over: Stalemate";
+        }
+
+        return "";
     }
 
     private void drawBoard(ArrayList<ChessPosition> positions){
@@ -330,5 +337,10 @@ public class GameplayClient {
                 case KNIGHT -> BLACK_KNIGHT;
             };
         }
+    }
+
+    //===== Websocket Functions
+    public void notify(ServerMessage msg) {
+        System.out.print(ERASE_LINE + SET_BG_COLOR_DARK_GREEN + msg + RESET_TEXT_COLOR);
     }
 }
