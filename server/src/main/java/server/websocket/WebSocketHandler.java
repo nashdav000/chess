@@ -27,7 +27,6 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         this.gameAccess = game;
     }
 
-
     @Override
     public void handleConnect(@NotNull WsConnectContext ctx) {
         System.out.println("Websocket connected");
@@ -46,7 +45,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID().toString(), command.getAuthToken(), ctx.session);
                 case MAKE_MOVE -> makeMove(command.getGameID().toString(), command.getAuthToken(), moveCommand.getMove(), ctx.session);
-                case LEAVE -> leave(ctx.session);
+                case LEAVE -> leave(command.getGameID().toString(), command.getAuthToken(), ctx.session);
                 case RESIGN -> resign();
             }
         }
@@ -146,7 +145,32 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         }
     }
 
-    private void leave(Session session){
+    private void leave(String gameID, String authToken, Session session) throws Exception {
+        // Data Validation
+        if (!validInput(gameID, authToken, session)){
+            return;
+        }
+
+        // Get the data
+        GameData game = gameAccess.getGame(gameID);
+        String username = authAccess.getAuth(authToken);
+        String message = "%s has left the game".formatted(username);
+
+        // Remove the player from the game
+        if (Objects.equals(username, game.whiteUsername())) {
+            game = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.chessGame());
+        }
+        else if (Objects.equals(username, game.blackUsername())) {
+            game = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.chessGame());
+        }
+        else {
+            message = "%s has stopped observing the game".formatted(username);
+        }
+        gameAccess.setGame(gameID, game);
+
+        // Broadcast to other players that someone left
+        var notif = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcastOthers(session, notif);
         connections.remove(session);
     }
 

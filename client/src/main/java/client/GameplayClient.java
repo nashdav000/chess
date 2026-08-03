@@ -27,6 +27,7 @@ public class GameplayClient implements NotificationHandler {
     public GameplayClient(ServerFacade facade, String color, ChessGame game, String id, String authToken) {
         this.facade = facade;
         ws = new WebsocketCommunicator(facade.URL(), this);
+
         this.playerColor = switch(color.toLowerCase()){
             case "white" -> WHITE;
             case "black" -> BLACK;
@@ -189,6 +190,7 @@ public class GameplayClient implements NotificationHandler {
         System.out.print(SET_TEXT_COLOR_BLUE + "Confirm leave? (Y/N)   " + RESET_TEXT_COLOR);
         String leaving = new Scanner(System.in).nextLine();
         if (!leaving.toLowerCase().contains("y")){
+            ws.leave(authToken, gameID);
             return "";
         }
 

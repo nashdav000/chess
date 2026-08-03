@@ -50,7 +50,7 @@ public class WebsocketCommunicator extends Endpoint {
         }
     }
 
-    public void makeMove(String authToken, String gameID, ChessMove move){
+    public void makeMove(String authToken, String gameID, ChessMove move) {
         try {
             MakeMoveCommand command = new MakeMoveCommand(UserGameCommand.CommandType.CONNECT, authToken, Integer.parseInt(gameID), move);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
@@ -60,8 +60,14 @@ public class WebsocketCommunicator extends Endpoint {
         }
     }
 
-    public void leave(){
-
+    public void leave(String authToken, String gameID){
+        try {
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, Integer.parseInt(gameID));
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        }
+        catch (Exception e){
+            throw new ServerException(e.getMessage());
+        }
     }
 
     public void resign(){
