@@ -102,7 +102,23 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         // Get the game
         GameData game = gameAccess.getGame(gameID);
 
-        // Make a move
+        // Validate the player can make the move
+        ChessGame.TeamColor pieceColor = game.chessGame().getBoard().getPiece(move.getStartPosition()).getTeamColor();
+        String username = authAccess.getAuth(authToken);
+
+        if (pieceColor == ChessGame.TeamColor.WHITE && !Objects.equals(username, game.whiteUsername())) {
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Not your color");
+            connections.broadcastSelf(session, error);
+            return;
+        }
+
+        if (pieceColor == ChessGame.TeamColor.BLACK && !Objects.equals(username, game.blackUsername())) {
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Not your color");
+            connections.broadcastSelf(session, error);
+            return;
+        }
+
+        // Make the move
         try {
             game.chessGame().makeMove(move);
         }
@@ -118,7 +134,6 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         connections.broadcastAll(session, loadGame);
 
         // Broadcast move
-        String username = authAccess.getAuth(authToken);
         String message = "%s moved %s %s".formatted(username, move.getStartPosition().toString(), move.getEndPosition().toString());
         var notif = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcastOthers(session, notif);

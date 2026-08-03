@@ -159,15 +159,8 @@ public class GameplayClient implements NotificationHandler {
             }
 
             // Move the piece
-//            try {
-                ws.makeMove(authToken, gameID, new ChessMove(start, end, promo));
-//                game.makeMove(new ChessMove(start, end, promo));
-//                redraw();
-                return checkIfGameOver();
-//            }
-//            catch (InvalidMoveException e) {
-//                throw new ClientError("Error: %s".formatted(e.getMessage()));
-//            }
+            ws.makeMove(authToken, gameID, new ChessMove(start, end, promo));
+            return checkIfGameOver();
         }
         else{
             throw new ClientError("Error: Expected <start> <end> <optional promotion>");
