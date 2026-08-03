@@ -353,7 +353,7 @@ public class GameplayClient implements NotificationHandler {
     private String handleMessage(Notification notif){
         return switch(notif.serverMessageType()){
             case LOAD_GAME -> "Joined game %s".formatted(notif.game());
-            case ERROR -> "Error: %s".formatted(notif.errorMessage());
+            case ERROR -> notif.errorMessage();
             case NOTIFICATION -> "%s joined the game".formatted(notif.message());
         };
     }

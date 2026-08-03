@@ -2,14 +2,12 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
-import dataaccess.MySQLAuthDAO;
+import dataaccess.GameDAO;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.UserGameCommand;
-import websocket.messages.LoadGameMessage;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
 import java.io.IOException;
 
@@ -17,9 +15,11 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
 
     private final ConnectionManager connections = new ConnectionManager();
     private final AuthDAO authAccess;
+    private final GameDAO gameAccess;
 
-    public WebSocketHandler(AuthDAO dao) {
-        this.authAccess = dao;
+    public WebSocketHandler(AuthDAO auth, GameDAO game) {
+        this.authAccess = auth;
+        this.gameAccess = game;
     }
 
 
@@ -50,7 +50,19 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         System.out.println("Websocket closed");
     }
 
-    private void connect(String gameID, String authToken, Session session) throws IOException {
+    private void connect(String gameID, String authToken, Session session) throws Exception {
+        if (authAccess.getAuth(authToken) == null) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid authToken");
+            connections.broadcastSelf(session, error);
+            return;
+        }
+
+        if (gameAccess.getGame(gameID) == null) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid gameID");
+            connections.broadcastSelf(session, error);
+            return;
+        }
+
         connections.add(gameID, session);
 
         var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID);
@@ -65,7 +77,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         }
 
         String message = "%s joined the game";
-        var notifyOthers = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s");
+        var notifyOthers = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, username);
         connections.broadcastOthers(session, notifyOthers);
     }
 
