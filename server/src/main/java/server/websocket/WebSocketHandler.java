@@ -10,6 +10,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCloseHandler {
 
@@ -51,7 +52,10 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
     }
 
     private void connect(String gameID, String authToken, Session session) throws Exception {
-        if (authAccess.getAuth(authToken) == null) {
+
+        // Data Validation
+        String username = authAccess.getAuth(authToken);
+        if (username == null) {
             var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid authToken");
             connections.broadcastSelf(session, error);
             return;
@@ -63,21 +67,27 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
             return;
         }
 
+        // Add the root client
         connections.add(gameID, session);
 
+        // Notify the root client they joined the game
         var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID);
         connections.broadcastSelf(session, loadGame);
 
-        String username;
-        try {
-            username = authAccess.getAuth(authToken);
+
+        // Notify all other clients in the game root client joined
+        String message = "%s joined the game as".formatted(username);
+        if (Objects.equals(gameAccess.getGame(gameID).blackUsername(), username)) {
+            message += " black";
         }
-        catch (Exception e){
-            throw new IOException(e.getMessage());
+        else if (Objects.equals(gameAccess.getGame(gameID).whiteUsername(), username)) {
+            message += " white";
+        }
+        else {
+            message += " an observer";
         }
 
-        String message = "%s joined the game";
-        var notifyOthers = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, username);
+        var notifyOthers = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcastOthers(session, notifyOthers);
     }
 
@@ -88,7 +98,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
     }
 
     private void leave(Session session){
-
+        connections.remove(session);
     }
 
     private void resign(){
