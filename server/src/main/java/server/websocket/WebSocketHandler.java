@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
@@ -13,7 +14,6 @@ import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCloseHandler {
@@ -92,8 +92,6 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         connections.broadcastOthers(session, notifyOthers);
     }
 
-
-
     private void makeMove(String gameID, String authToken, ChessMove move, Session session) throws Exception {
 
         // Validate input
@@ -119,10 +117,18 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID);
         connections.broadcastAll(session, loadGame);
 
+        // Broadcast move
         String username = authAccess.getAuth(authToken);
         String message = "%s moved %s %s".formatted(username, move.getStartPosition().toString(), move.getEndPosition().toString());
         var notif = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcastOthers(session, notif);
+
+        // Check if check, checkmate, or stalemate
+        message = isIncheckCheckmateStalemate(game);
+        if (!message.isEmpty()) {
+            var gameUpdate = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+            connections.broadcastAll(session, gameUpdate);
+        }
     }
 
     private void leave(Session session){
@@ -156,5 +162,33 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
             connections.broadcastSelf(session, error);
             return false;
         }
+    }
+
+    private String isIncheckCheckmateStalemate(GameData game) {
+        if (game.chessGame().isInCheck(ChessGame.TeamColor.WHITE)) {
+            return "%s is in check".formatted(game.whiteUsername());
+        }
+
+        if (game.chessGame().isInCheck(ChessGame.TeamColor.BLACK)) {
+            return "%s is in check".formatted(game.blackUsername());
+        }
+
+        if (game.chessGame().isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            return "%s is in checkmate".formatted(game.whiteUsername());
+        }
+
+        if (game.chessGame().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            return "%s is in checkmate".formatted(game.blackUsername());
+        }
+
+        if (game.chessGame().isInStalemate(ChessGame.TeamColor.WHITE)) {
+            return "%s is in stalemate".formatted(game.whiteUsername());
+        }
+
+        if (game.chessGame().isInStalemate(ChessGame.TeamColor.BLACK)) {
+            return "%s is in stalemate".formatted(game.blackUsername());
+        }
+
+        return "";
     }
 }
