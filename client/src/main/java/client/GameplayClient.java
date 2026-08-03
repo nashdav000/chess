@@ -1,11 +1,9 @@
 package client;
 
 import chess.*;
+import client.websocket.Notification;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketCommunicator;
-import com.google.gson.Gson;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
 import java.util.*;
 
@@ -347,21 +345,16 @@ public class GameplayClient implements NotificationHandler {
     }
 
     //===== Websocket Functions
-    public void notify(ServerMessage msg) {
-        System.out.print(ERASE_LINE + SET_TEXT_COLOR_GREEN + handleMessage(msg) + RESET_TEXT_COLOR);
+    public void notify(Notification notif) {
+        System.out.print(ERASE_LINE + SET_TEXT_COLOR_GREEN + handleMessage(notif) + RESET_TEXT_COLOR);
         promptUser();
     }
 
-    private String handleMessage(ServerMessage msg){
-        return switch(msg.getServerMessageType()){
-            case NOTIFICATION: {
-                ServerMessage.
-                "%s joined the game".formatted(msg);
-            }
-            case LOAD_GAME: {
-                "Joined game %s".formatted(gameID);
-            }
-            default -> "Not yet implemented";
+    private String handleMessage(Notification notif){
+        return switch(notif.serverMessageType()){
+            case LOAD_GAME -> "Joined game %s".formatted(notif.game());
+            case ERROR -> "Error: %s".formatted(notif.errorMessage());
+            case NOTIFICATION -> "%s joined the game".formatted(notif.message());
         };
     }
 }

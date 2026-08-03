@@ -64,7 +64,8 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
             throw new IOException(e.getMessage());
         }
 
-        var notifyOthers = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, username);
+        String message = "%s joined the game";
+        var notifyOthers = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s");
         connections.broadcastOthers(session, notifyOthers);
     }
 
