@@ -46,7 +46,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
                 case CONNECT -> connect(command.getGameID().toString(), command.getAuthToken(), ctx.session);
                 case MAKE_MOVE -> makeMove(command.getGameID().toString(), command.getAuthToken(), moveCommand.getMove(), ctx.session);
                 case LEAVE -> leave(command.getGameID().toString(), command.getAuthToken(), ctx.session);
-                case RESIGN -> resign();
+                case RESIGN -> resign(command.getGameID().toString(), command.getAuthToken(), ctx.session);
             }
         }
         catch (Exception e){
@@ -174,8 +174,29 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         connections.remove(session);
     }
 
-    private void resign(){
+    private void resign(String gameID, String authToken, Session session) throws Exception {
+        // Data Validation
+        if (!validInput(gameID, authToken, session)){
+            return;
+        }
 
+        // Get the data
+        GameData game = gameAccess.getGame(gameID);
+        String username = authAccess.getAuth(authToken);
+        String message = "%s has resigned".formatted(username);
+
+        // Check if they are an actual player
+        if (!Objects.equals(username, game.whiteUsername()) && !Objects.equals(username, game.blackUsername())) {
+            message = "Error: Observers cannot resign";
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            connections.broadcastSelf(session, error);
+            return;
+        }
+
+        // Broadcast to other players that someone resigned
+        var notif = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcastAll(session, notif);
+        connections.remove(session);
     }
 
     //===== Helper Functions
