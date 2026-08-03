@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    
+
 
     public final ConcurrentHashMap<Session, String> connections = new ConcurrentHashMap<>();
 
@@ -40,5 +40,10 @@ public class ConnectionManager {
         if (session.isOpen()) {
             session.getRemote().sendString(msg);
         }
+    }
+
+    public void broadcastAll(Session s, ServerMessage sm) throws IOException {
+        broadcastOthers(s, sm);
+        broadcastSelf(s, sm);
     }
 }

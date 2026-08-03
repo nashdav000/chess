@@ -4,6 +4,7 @@ import chess.*;
 import client.websocket.Notification;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketCommunicator;
+import websocket.messages.ServerMessage;
 
 import java.util.*;
 
@@ -125,15 +126,18 @@ public class GameplayClient implements NotificationHandler {
     }
 
     private String move(String... params) throws ClientError {
+        // Check if the game is over
         if (!checkIfGameOver().isEmpty()) {
             throw new ClientError ("Error: Game is over");
         }
 
+        // Prevent observers from moving pieces
         if (playerColor == null){
             throw new ClientError("Error: Observers can't make moves");
         }
 
         if (params.length >= 2){
+            // Validate input
             if (!params[0].matches("^[a-h][1-8]$") || !params[1].matches("^[a-h][1-8]$")){
                 throw new ClientError("Error: %s %s is not valid position".formatted(params[0], params[1]));
             }
@@ -149,18 +153,21 @@ public class GameplayClient implements NotificationHandler {
                 default -> null;
             };
 
+            // Prevent opponent's from moving their opponent's piece
             if (playerColor != game.getBoard().getPiece(start).getTeamColor()){
                 throw new ClientError("Error: Cannot move opponent's pieces");
             }
 
-            try {
-                game.makeMove(new ChessMove(start, end, promo));
-                redraw();
+            // Move the piece
+//            try {
+                ws.makeMove(authToken, gameID, new ChessMove(start, end, promo));
+//                game.makeMove(new ChessMove(start, end, promo));
+//                redraw();
                 return checkIfGameOver();
-            }
-            catch (InvalidMoveException e) {
-                throw new ClientError("Error: %s".formatted(e.getMessage()));
-            }
+//            }
+//            catch (InvalidMoveException e) {
+//                throw new ClientError("Error: %s".formatted(e.getMessage()));
+//            }
         }
         else{
             throw new ClientError("Error: Expected <start> <end> <optional promotion>");
@@ -351,8 +358,12 @@ public class GameplayClient implements NotificationHandler {
     }
 
     private String handleMessage(Notification notif){
+        if (notif.serverMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+            redraw();
+        }
+
         return switch(notif.serverMessageType()){
-            case LOAD_GAME -> "Joined game %s".formatted(notif.game());
+            case LOAD_GAME -> notif.game();
             case ERROR -> notif.errorMessage();
             case NOTIFICATION -> notif.message();
         };

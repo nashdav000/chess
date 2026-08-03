@@ -1,11 +1,15 @@
 package server.websocket;
 
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.jetbrains.annotations.NotNull;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
 
@@ -34,9 +38,14 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
     public void handleMessage(@NotNull WsMessageContext ctx) {
         try {
             UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+            MakeMoveCommand moveCommand = null;
+            if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
+                moveCommand = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
+            }
+
             switch (command.getCommandType()){
                 case CONNECT -> connect(command.getGameID().toString(), command.getAuthToken(), ctx.session);
-                case MAKE_MOVE -> makeMove();
+                case MAKE_MOVE -> makeMove(command.getGameID().toString(), command.getAuthToken(), moveCommand.getMove(), ctx.session);
                 case LEAVE -> leave(ctx.session);
                 case RESIGN -> resign();
             }
@@ -54,16 +63,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
     private void connect(String gameID, String authToken, Session session) throws Exception {
 
         // Data Validation
-        String username = authAccess.getAuth(authToken);
-        if (username == null) {
-            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid authToken");
-            connections.broadcastSelf(session, error);
-            return;
-        }
-
-        if (gameAccess.getGame(gameID) == null) {
-            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid gameID");
-            connections.broadcastSelf(session, error);
+        if (!validInput(gameID, authToken, session)){
             return;
         }
 
@@ -71,11 +71,12 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         connections.add(gameID, session);
 
         // Notify the root client they joined the game
-        var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID);
+        var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, "Joined game %s".formatted(gameID));
         connections.broadcastSelf(session, loadGame);
 
 
         // Notify all other clients in the game root client joined
+        String username = authAccess.getAuth(authToken);
         String message = "%s joined the game as".formatted(username);
         if (Objects.equals(gameAccess.getGame(gameID).blackUsername(), username)) {
             message += " black";
@@ -93,8 +94,35 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
 
 
 
-    private void makeMove(){
+    private void makeMove(String gameID, String authToken, ChessMove move, Session session) throws Exception {
 
+        // Validate input
+        if (!validInput(gameID, authToken, session)) {
+            return;
+        }
+
+        // Get the game
+        GameData game = gameAccess.getGame(gameID);
+
+        // Make a move
+        try {
+            game.chessGame().makeMove(move);
+        }
+        catch (InvalidMoveException e) {
+            ErrorMessage error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid move");
+            connections.broadcastSelf(session, error);
+            return;
+        }
+        gameAccess.setGame(gameID, game);
+
+        // Broadcast to everyone that a move was made
+        var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID);
+        connections.broadcastAll(session, loadGame);
+
+        String username = authAccess.getAuth(authToken);
+        String message = "%s moved %s %s".formatted(username, move.getStartPosition().toString(), move.getEndPosition().toString());
+        var notif = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcastOthers(session, notif);
     }
 
     private void leave(Session session){
@@ -103,5 +131,30 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
 
     private void resign(){
 
+    }
+
+    //===== Helper Functions
+    private boolean validInput(String gameID, String authToken, Session session) throws Exception {
+        try {
+            String username = authAccess.getAuth(authToken);
+            if (username == null) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid authToken");
+                connections.broadcastSelf(session, error);
+                return false;
+            }
+
+            if (gameAccess.getGame(gameID) == null) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Invalid gameID");
+                connections.broadcastSelf(session, error);
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception e) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: Unable to connect to server");
+            connections.broadcastSelf(session, error);
+            return false;
+        }
     }
 }
