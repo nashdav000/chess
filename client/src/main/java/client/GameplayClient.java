@@ -3,6 +3,8 @@ package client;
 import chess.*;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketCommunicator;
+import com.google.gson.Gson;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.*;
@@ -346,7 +348,20 @@ public class GameplayClient implements NotificationHandler {
 
     //===== Websocket Functions
     public void notify(ServerMessage msg) {
-        System.out.print(ERASE_LINE + SET_BG_COLOR_DARK_GREEN + msg.getServerMessageType() + RESET_TEXT_COLOR);
+        System.out.print(ERASE_LINE + SET_TEXT_COLOR_GREEN + handleMessage(msg) + RESET_TEXT_COLOR);
         promptUser();
+    }
+
+    private String handleMessage(ServerMessage msg){
+        return switch(msg.getServerMessageType()){
+            case NOTIFICATION: {
+                ServerMessage.
+                "%s joined the game".formatted(msg);
+            }
+            case LOAD_GAME: {
+                "Joined game %s".formatted(gameID);
+            }
+            default -> "Not yet implemented";
+        };
     }
 }

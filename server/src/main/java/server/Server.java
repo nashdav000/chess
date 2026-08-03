@@ -36,8 +36,8 @@ public class Server {
 
         this.userService = new UserService(userDAO, authDAO);
         this.gameService = new GameService(gameDAO, authDAO);
+        this.webSocketHandler = new WebSocketHandler(authDAO);
 
-        webSocketHandler = new WebSocketHandler();
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // User Endpoints
@@ -131,8 +131,10 @@ public class Server {
     private void joinGames(Context ctx) throws DataAccessException {
         record Info(String playerColor, String gameID){}
         Info body = new Gson().fromJson(ctx.body(), Info.class);
+
         JoinRequest request = new JoinRequest(ctx.header("authorization"), body.playerColor, body.gameID);
         JoinResult result = gameService.joinGame(request);
+
         String json = new Gson().toJson(result);
         ctx.json(json);
     }

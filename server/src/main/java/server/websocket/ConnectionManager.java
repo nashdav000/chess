@@ -10,6 +10,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
+    
+
     public final ConcurrentHashMap<Session, String> connections = new ConcurrentHashMap<>();
 
     public void add(String gameID, Session session) {connections.put(session, gameID);}
@@ -18,17 +20,25 @@ public class ConnectionManager {
         connections.remove(session);
     }
 
-    public void broadcast(Session excludedSession, ServerMessage message) throws IOException {
+    public void broadcastOthers(Session excludedSession, ServerMessage message) throws IOException {
         String msg = new Gson().toJson(message);
         String gameID = connections.get(excludedSession);
 
         for (Session s : connections.keySet()){
             if (s.isOpen()){
-                if (Objects.equals(connections.get(s), gameID)){
+                if (Objects.equals(connections.get(s), gameID) && s != excludedSession){
                     s.getRemote().sendString(msg);
                 }
             }
 
+        }
+    }
+
+    public void broadcastSelf(Session session, ServerMessage message) throws IOException {
+        String msg = new Gson().toJson(message);
+
+        if (session.isOpen()) {
+            session.getRemote().sendString(msg);
         }
     }
 }
