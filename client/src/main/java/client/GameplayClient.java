@@ -181,6 +181,7 @@ public class GameplayClient implements NotificationHandler {
         // Resignation Confirmation
         System.out.print(SET_TEXT_COLOR_BLUE + "Confirm resignation? (Y/N)   " + RESET_TEXT_COLOR);
         String s = new Scanner(System.in).nextLine();
+
         if (!s.toLowerCase().contains("y")){
             return "";
         }
@@ -193,6 +194,7 @@ public class GameplayClient implements NotificationHandler {
         // Leave Confirmation
         System.out.print(SET_TEXT_COLOR_BLUE + "Confirm leave? (Y/N)   " + RESET_TEXT_COLOR);
         String leaving = new Scanner(System.in).nextLine();
+
         if (!leaving.toLowerCase().contains("y")){
             return "";
         }
@@ -213,20 +215,6 @@ public class GameplayClient implements NotificationHandler {
             case 'g' -> 7;
             case 'h' -> 8;
             default -> -1;
-        };
-    }
-
-    private char convertIntToCol(char col){
-        return switch(col) {
-            case '1' -> 'a';
-            case '2' -> 'b';
-            case '3' -> 'c';
-            case '4' -> 'd';
-            case '5' -> 'e';
-            case '6' -> 'f';
-            case '7' -> 'g';
-            case '8' -> 'h';
-            default -> '-';
         };
     }
 
@@ -401,5 +389,19 @@ public class GameplayClient implements NotificationHandler {
         String notatedEnd = convertIntToCol(endPos.charAt(4)) + "" + endPos.charAt(1);
 
         return msg.substring(0, msg.length() - 14) + " %s %s".formatted(notatedStart, notatedEnd);
+    }
+
+    private char convertIntToCol(char col){
+        return switch(col) {
+            case '1' -> 'a';
+            case '2' -> 'b';
+            case '3' -> 'c';
+            case '4' -> 'd';
+            case '5' -> 'e';
+            case '6' -> 'f';
+            case '7' -> 'g';
+            case '8' -> 'h';
+            default -> '-';
+        };
     }
 }

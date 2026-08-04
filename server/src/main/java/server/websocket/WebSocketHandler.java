@@ -220,7 +220,6 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         // Broadcast to other players that someone resigned
         var notif = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcastAll(session, notif);
-        connections.remove(session);
     }
 
     //===== Helper Functions
@@ -248,17 +247,21 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         }
     }
 
-    private String isInCheckCheckmateStalemate(GameData game) {
+    private String isInCheckCheckmateStalemate(GameData game) throws Exception {
         if (game.chessGame().isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            changeGameName(game);
             return "%s has been checkmated. %s wins".formatted(game.whiteUsername(), game.blackUsername());
         }
         else if (game.chessGame().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            changeGameName(game);
             return "%s has been checkmated. %s wins".formatted(game.blackUsername(), game.whiteUsername());
         }
         else if (game.chessGame().isInStalemate(ChessGame.TeamColor.WHITE)) {
+            changeGameName(game);
             return "%s has been stalemated. The game is a draw".formatted(game.whiteUsername());
         }
         else if (game.chessGame().isInStalemate(ChessGame.TeamColor.BLACK)) {
+            changeGameName(game);
             return "%s is in stalemate. The game is a draw".formatted(game.blackUsername());
         }
         else if (game.chessGame().isInCheck(ChessGame.TeamColor.WHITE)) {
@@ -269,5 +272,11 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         }
 
         return "";
+    }
+
+    private void changeGameName(GameData game) throws Exception {
+        game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(),
+                game.gameName() + " — Finished", game.chessGame());
+        gameAccess.setGame(game.gameID(), game);
     }
 }
