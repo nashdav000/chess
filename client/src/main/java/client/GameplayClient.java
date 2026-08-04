@@ -46,6 +46,10 @@ public class GameplayClient implements NotificationHandler {
         String result = "";
 
         while (!result.equals("quit")){
+            if (game.isOver()) {
+                System.out.println(SET_TEXT_COLOR_RED + "Note: Game is over" + RESET_TEXT_COLOR);
+            }
+
             promptUser();
             String line = scanner.nextLine();
 

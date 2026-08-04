@@ -1,6 +1,6 @@
 resigning from the game then immediately leaving doesn't give a notification
 gameplay updates aren't in chess notation
-joining a finished game doesn't give a prompt
 error messages and game boards dont erase the gamplay >>> prompt
 games should be deleted when finished
 do pawns promote?
+add note to games name noting that they are finished
