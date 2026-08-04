@@ -14,11 +14,13 @@ public class ChessGame {
 
     private TeamColor turn;
     private ChessBoard gameBoard;
+    private boolean isOver;
 
     public ChessGame() {
         turn = TeamColor.WHITE;
         gameBoard = new ChessBoard();
         gameBoard.resetBoard();
+        isOver = false;
     }
 
     /**
@@ -185,7 +187,8 @@ public class ChessGame {
         boolean stuck = canMove(teamColor);
 
         if (isInCheck(teamColor)){
-            return !stuck;
+            this.isOver = !stuck;
+            return isOver;
         }
         else{
             return false; // Stalemate
@@ -228,6 +231,11 @@ public class ChessGame {
 
         return stuck;
     }
+
+    public boolean isOver() {return this.isOver;}
+
+    public void markGameAsOver() {this.isOver = true;}
+
     /**
      * Sets this game's chessboard to a given board
      *

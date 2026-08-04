@@ -101,6 +101,14 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         // Get the game
         GameData game = gameAccess.getGame(gameID);
 
+        // Check if the game is over
+        if (game.chessGame().isOver()) {
+            String message = "Error: Game is over";
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            connections.broadcastSelf(session, error);
+            return;
+        }
+
         // Validate the player can make the move
         ChessGame.TeamColor pieceColor = game.chessGame().getBoard().getPiece(move.getStartPosition()).getTeamColor();
         String username = authAccess.getAuth(authToken);
@@ -185,6 +193,14 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         String username = authAccess.getAuth(authToken);
         String message = "%s has resigned".formatted(username);
 
+        // Check if the game is over
+        if (game.chessGame().isOver()) {
+            message = "Error: Game is over";
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message);
+            connections.broadcastSelf(session, error);
+            return;
+        }
+
         // Check if they are an actual player
         if (!Objects.equals(username, game.whiteUsername()) && !Objects.equals(username, game.blackUsername())) {
             message = "Error: Observers cannot resign";
@@ -192,6 +208,10 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
             connections.broadcastSelf(session, error);
             return;
         }
+
+        // Mark the game as done
+        game.chessGame().markGameAsOver();
+        gameAccess.setGame(gameID, game);
 
         // Broadcast to other players that someone resigned
         var notif = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
