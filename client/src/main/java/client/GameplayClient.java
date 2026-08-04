@@ -20,12 +20,12 @@ public class GameplayClient implements NotificationHandler {
     private final WebsocketCommunicator ws;
 
     private final TeamColor playerColor;
-    private ChessGame game;
+    private final ChessGame game;
     private final String gameID;
     private final String authToken;
 
     public GameplayClient(ServerFacade facade, String color, ChessGame game, String id, String authToken) {
-        ws = new WebsocketCommunicator(facade.URL(), this);
+        ws = new WebsocketCommunicator(facade.url(), this);
 
         this.playerColor = switch(color.toLowerCase()){
             case "white" -> WHITE;

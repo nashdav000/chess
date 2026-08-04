@@ -117,7 +117,7 @@ public class ServerFacade {
         return null;
     }
 
-    public String URL(){
+    public String url(){
         return this.serverUrl;
     }
 }
