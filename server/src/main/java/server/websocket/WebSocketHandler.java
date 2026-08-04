@@ -134,12 +134,13 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
             connections.broadcastSelf(session, error);
             return;
         }
+
+        isInCheckCheckmateStalemate(game);
         gameAccess.setGame(gameID, game);
         game = gameAccess.getGame(gameID);
 
-        // Broadcast to everyone that a move was made
+        // Broadcast to everyone that a move was made and the new board
         String json = new Gson().toJson(game.chessGame().getBoard());
-
         var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, json);
         connections.broadcastAll(session, loadGame);
 

@@ -178,10 +178,10 @@ public class GameplayClient implements NotificationHandler {
         System.out.print(SET_TEXT_COLOR_BLUE + "Confirm resignation? (Y/N)   " + RESET_TEXT_COLOR);
         String s = new Scanner(System.in).nextLine();
         if (!s.toLowerCase().contains("y")){
-            ws.resign(authToken, gameID);
             return "";
         }
 
+        ws.resign(authToken, gameID);
         return "Resigned from chess game\n";
     }
 
@@ -190,10 +190,10 @@ public class GameplayClient implements NotificationHandler {
         System.out.print(SET_TEXT_COLOR_BLUE + "Confirm leave? (Y/N)   " + RESET_TEXT_COLOR);
         String leaving = new Scanner(System.in).nextLine();
         if (!leaving.toLowerCase().contains("y")){
-            ws.leave(authToken, gameID);
             return "";
         }
 
+        ws.leave(authToken, gameID);
         return "Left chess game\n";
     }
 
@@ -364,7 +364,7 @@ public class GameplayClient implements NotificationHandler {
 
         return switch(notif.serverMessageType()){
             case LOAD_GAME -> notif.game();
-            case ERROR -> notif.errorMessage();
+            case ERROR -> SET_TEXT_COLOR_RED + notif.errorMessage();
             case NOTIFICATION -> notif.message();
         };
     }

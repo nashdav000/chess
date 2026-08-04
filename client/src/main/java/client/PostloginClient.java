@@ -127,7 +127,7 @@ public class PostloginClient {
         }
     }
 
-    private String observe(String... params){
+    private String observe(String... params) throws ClientError {
         if (params.length >= 1){
             String id = params[0];
             switchtoGameplay("", id);
@@ -143,16 +143,14 @@ public class PostloginClient {
         return "quit";
     }
 
-    private void switchtoGameplay(String color, String id){
-        try {
-            for (GameData g : facade.listGames(authToken)){
-                if (Objects.equals(g.gameID(), id)){
-                    new GameplayClient(facade, color, g.chessGame(), id, authToken).run();
-                }
+    private void switchtoGameplay(String color, String id) throws ClientError {
+        for (GameData g : facade.listGames(authToken)){
+            if (Objects.equals(g.gameID(), id)){
+                new GameplayClient(facade, color, g.chessGame(), id, authToken).run();
+                return;
             }
-
-        } catch (Exception e) {
-            System.out.print("Error: Unable to initiate gameplay. Try again later\n");
         }
+
+        throw new ClientError("Error: Game ID does not exist");
     }
 }
