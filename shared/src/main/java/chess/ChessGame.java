@@ -206,7 +206,8 @@ public class ChessGame {
         boolean stuck = canMove(teamColor);
 
         if (!isInCheck(teamColor)){
-            return !stuck;
+            this.isOver = !stuck;
+            return isOver;
         }
         else{
             return false; // Checkmate

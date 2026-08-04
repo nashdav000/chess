@@ -4,6 +4,7 @@ import chess.*;
 import client.websocket.Notification;
 import client.websocket.NotificationHandler;
 import client.websocket.WebsocketCommunicator;
+import com.google.gson.Gson;
 import websocket.messages.ServerMessage;
 
 import java.util.*;
@@ -16,16 +17,14 @@ import static ui.EscapeSequences.*;
 
 public class GameplayClient implements NotificationHandler {
 
-    private final ServerFacade facade;
     private final WebsocketCommunicator ws;
 
     private final TeamColor playerColor;
-    private final ChessGame game;
+    private ChessGame game;
     private final String gameID;
     private final String authToken;
 
     public GameplayClient(ServerFacade facade, String color, ChessGame game, String id, String authToken) {
-        this.facade = facade;
         ws = new WebsocketCommunicator(facade.URL(), this);
 
         this.playerColor = switch(color.toLowerCase()){
@@ -82,7 +81,6 @@ public class GameplayClient implements NotificationHandler {
     private void promptUser(){System.out.print("\n" + ERASE_SCREEN + "[GAMEPLAY] >>> " + SET_TEXT_COLOR_GREEN);}
 
     //===== User Actions Functions
-
     private String help(){
         return SET_TEXT_COLOR_YELLOW +
                """
@@ -170,6 +168,7 @@ public class GameplayClient implements NotificationHandler {
     }
 
     private String redraw(){
+        System.out.print("\n");
         drawBoard(null);
         return checkIfGameOver();
     }
@@ -179,6 +178,7 @@ public class GameplayClient implements NotificationHandler {
         System.out.print(SET_TEXT_COLOR_BLUE + "Confirm resignation? (Y/N)   " + RESET_TEXT_COLOR);
         String s = new Scanner(System.in).nextLine();
         if (!s.toLowerCase().contains("y")){
+            ws.resign(authToken, gameID);
             return "";
         }
 
@@ -354,7 +354,12 @@ public class GameplayClient implements NotificationHandler {
 
     private String handleMessage(Notification notif){
         if (notif.serverMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
-            redraw();
+            ChessBoard updatedBoard = new Gson().fromJson(notif.game(), ChessBoard.class);
+            if (updatedBoard != null) {
+                this.game.setBoard(updatedBoard);
+                redraw();
+                return "";
+            }
         }
 
         return switch(notif.serverMessageType()){

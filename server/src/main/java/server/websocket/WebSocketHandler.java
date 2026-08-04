@@ -135,9 +135,12 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
             return;
         }
         gameAccess.setGame(gameID, game);
+        game = gameAccess.getGame(gameID);
 
         // Broadcast to everyone that a move was made
-        var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID);
+        String json = new Gson().toJson(game.chessGame().getBoard());
+
+        var loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, json);
         connections.broadcastAll(session, loadGame);
 
         // Broadcast move
@@ -146,7 +149,7 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         connections.broadcastOthers(session, notif);
 
         // Check if check, checkmate, or stalemate
-        message = isIncheckCheckmateStalemate(game);
+        message = isInCheckCheckmateStalemate(game);
         if (!message.isEmpty()) {
             var gameUpdate = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
             connections.broadcastAll(session, gameUpdate);
@@ -244,29 +247,24 @@ public class WebSocketHandler implements WsConnectHandler,WsMessageHandler, WsCl
         }
     }
 
-    private String isIncheckCheckmateStalemate(GameData game) {
-        if (game.chessGame().isInCheck(ChessGame.TeamColor.WHITE)) {
+    private String isInCheckCheckmateStalemate(GameData game) {
+        if (game.chessGame().isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            return "%s has been checkmated. %s wins".formatted(game.whiteUsername(), game.blackUsername());
+        }
+        else if (game.chessGame().isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            return "%s has been checkmated. %s wins".formatted(game.blackUsername(), game.whiteUsername());
+        }
+        else if (game.chessGame().isInStalemate(ChessGame.TeamColor.WHITE)) {
+            return "%s has been stalemated. The game is a draw".formatted(game.whiteUsername());
+        }
+        else if (game.chessGame().isInStalemate(ChessGame.TeamColor.BLACK)) {
+            return "%s is in stalemate. The game is a draw".formatted(game.blackUsername());
+        }
+        else if (game.chessGame().isInCheck(ChessGame.TeamColor.WHITE)) {
             return "%s is in check".formatted(game.whiteUsername());
         }
-
-        if (game.chessGame().isInCheck(ChessGame.TeamColor.BLACK)) {
+        else if (game.chessGame().isInCheck(ChessGame.TeamColor.BLACK)) {
             return "%s is in check".formatted(game.blackUsername());
-        }
-
-        if (game.chessGame().isInCheckmate(ChessGame.TeamColor.WHITE)) {
-            return "%s is in checkmate".formatted(game.whiteUsername());
-        }
-
-        if (game.chessGame().isInCheckmate(ChessGame.TeamColor.BLACK)) {
-            return "%s is in checkmate".formatted(game.blackUsername());
-        }
-
-        if (game.chessGame().isInStalemate(ChessGame.TeamColor.WHITE)) {
-            return "%s is in stalemate".formatted(game.whiteUsername());
-        }
-
-        if (game.chessGame().isInStalemate(ChessGame.TeamColor.BLACK)) {
-            return "%s is in stalemate".formatted(game.blackUsername());
         }
 
         return "";

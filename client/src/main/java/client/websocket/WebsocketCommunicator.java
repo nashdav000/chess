@@ -4,9 +4,7 @@ import chess.ChessMove;
 import client.ServerException;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
-import websocket.commands.MakeMoveCommand;
-import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
+import websocket.commands.*;
 
 import java.net.URI;
 
@@ -52,7 +50,7 @@ public class WebsocketCommunicator extends Endpoint {
 
     public void makeMove(String authToken, String gameID, ChessMove move) {
         try {
-            MakeMoveCommand command = new MakeMoveCommand(UserGameCommand.CommandType.CONNECT, authToken, Integer.parseInt(gameID), move);
+            MakeMoveCommand command = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, Integer.parseInt(gameID), move);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         }
         catch (Exception e){
