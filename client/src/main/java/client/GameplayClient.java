@@ -216,6 +216,20 @@ public class GameplayClient implements NotificationHandler {
         };
     }
 
+    private char convertIntToCol(char col){
+        return switch(col) {
+            case '1' -> 'a';
+            case '2' -> 'b';
+            case '3' -> 'c';
+            case '4' -> 'd';
+            case '5' -> 'e';
+            case '6' -> 'f';
+            case '7' -> 'g';
+            case '8' -> 'h';
+            default -> '-';
+        };
+    }
+
     private String checkIfGameOver(){
         if (game.isInCheckmate(BLACK)) {
             return "Game over: White wins";
@@ -369,7 +383,23 @@ public class GameplayClient implements NotificationHandler {
         return switch(notif.serverMessageType()){
             case LOAD_GAME -> notif.game();
             case ERROR -> SET_TEXT_COLOR_RED + notif.errorMessage();
-            case NOTIFICATION -> notif.message();
+            case NOTIFICATION -> handleNotifications(notif.message());
         };
+    }
+
+    //===== Websocket Helper Functions
+
+    private String handleNotifications(String msg) {
+        if (!msg.contains("moved")) {
+            return msg;
+        }
+
+        String startPos = msg.substring(msg.length() - 13, msg.length() - 7);
+        String endPos = msg.substring(msg.length() - 6);
+
+        String notatedStart = convertIntToCol(startPos.charAt(4)) + "" + startPos.charAt(1);
+        String notatedEnd = convertIntToCol(endPos.charAt(4)) + "" + endPos.charAt(1);
+
+        return msg.substring(0, msg.length() - 14) + " %s %s".formatted(notatedStart, notatedEnd);
     }
 }
