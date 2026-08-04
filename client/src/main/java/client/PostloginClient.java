@@ -104,6 +104,11 @@ public class PostloginClient {
 
         String response = "";
         for (GameData g : games) {
+            // Hide Finished Games
+            if (g.gameName().contains(" — Finished")) {
+                continue;
+            }
+
             response += "Game #" + g.gameID() + "\t" + g.gameName() +
                     "\n\tWhite: " + (g.whiteUsername() != null ? g.whiteUsername() : "") +
                     "\n\tBlack: " + (g.blackUsername() != null ? g.blackUsername() : "") +
